@@ -1,0 +1,303 @@
+<div *ngIf="!showPrint" class="container-fluid">
+  <div class="col-sm-12 content_page">
+    <div class="row titre_page_appro">
+      <h4>ACCUSE DE RECEPTION</h4>
+    </div>
+    <div>
+      <div class="row">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-3">
+          <h5 class="texte_reglement">
+            <img src="../../assets/img/logo2.png" class="img-responsive logo_menu_haut" style="margin: auto">
+          </h5>
+        </div>
+        <div class="col-sm-8"></div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <h5 class="texte_reglement">Caisse Nationale de Prévoyance Sociale</h5>
+          <div class="row">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-5">
+              <h5 class="texte_reglement">C.N.a.P.S</h5>
+            </div>
+            <div class="col-sm-4"></div>
+          </div>
+          <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-10">
+              <h5 class="texte_reglement">Tél. 22 205 20</h5>
+            </div>
+          </div>
+          <h5 class="texte_reglement">
+            <strong>AMPEFILOHA - ANTANANARIVO</strong>
+          </h5>
+        </div>
+        <div class="col-sm-6"></div>
+      </div>
+      <p style="text-align: center; font-size: 35px;font-weight: bold">{{titre}}</p>
+      <div class="row">
+        <div class="col-sm-12 texte_reglement">
+          <table style="width : 100%;">
+            <tr>
+              <td style="width: 10%;">Réference:</td>
+              <td style="width: 20%;">{{reference}}</td>
+            </tr>
+            <tr>
+              <td style="width: 10%;">Matricule:</td>
+              <td style="width: 20%;">{{matricule}}</td>
+            </tr>
+            <tr>
+              <td style="width: 10%;">Nom:</td>
+              <td style="width: 20%;">{{nom}}</td>
+            </tr>
+            <tr>
+              <td style="width: 10%;">Prénoms:</td>
+              <td style="width: 20%;">{{prenoms}}</td>
+            </tr>
+            <tr *ngIf="bafRet">
+              <td>
+                <table>
+                  <tbody>
+                    <tr *ngFor="let bf of bafRet">
+                      <td>Période : <i>{{ bf.periode}}</i></td>
+                      <td style="padding-left: 100px">Paiement : <i>{{ bf.paiement}}</i></td>
+                      <td style="padding-left: 100px">Folio : {{ bf.folio}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 10%;">Date de réception:</td>
+              <td style="width: 20%;">{{dateReception | date:'dd/MM/yyyy'}}</td>
+            </tr>
+            <tr>
+              <td style="width: 10%;">Demande:</td>
+              <td style="width: 20%;">{{typeDemande}}</td>
+            </tr>
+            <tr>
+              <td style="width: 10%;">Mode de paiement:</td>
+              <td style="width: 20%;">{{modePaiement}}</td>
+            </tr>
+            <tr>
+              <td style="width: 10%;">Agence:</td>
+              <td style="width: 20%;">{{agence}}</td>
+            </tr>
+            <tr>
+              <td style="width: 10%;">Banque:</td>
+              <td style="width: 20%;">{{banque}}</td>
+            </tr>
+            <tr>
+              <td style="width: 10%;">Numéro de compte:</td>
+              <td style="width: 20%;">{{numCompte}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <br>
+      <div *ngIf="size != 0">
+        <div class="row">
+          <div class="col-sm-4">
+            <h6>
+              <strong class="col-form-label texte-content">Pièce(s) reçue(s)</strong>
+            </h6>
+          </div>
+          <div class="col-sm-8"></div>
+        </div><br>
+        <div class="row">
+          <div class="col-sm-2"></div>
+          <div class="col-sm-10">
+            <ul *ngFor="let piece of listePieces; let i = index">
+              <li>{{piece}}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="sizeP != 0">
+        <div class="row">
+          <div class="col-sm-2">
+            <h6>
+              <strong class="col-form-label texte-content">{{pcsrecu}}</strong>
+            </h6>
+          </div>
+          <div class="col-sm-2">
+            <h6>
+              <strong class="col-form-label texte-content">{{pcsretourn}}</strong>
+            </h6>
+          </div>
+          <div class="col-sm-10"></div>
+        </div>
+        <div class="row">
+          <div class="col-sm-2"></div>
+          <div class="col-sm-10">
+            <ul *ngFor="let piece of pieceJointe; let i = index">
+              <li>{{piece.name}}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <p style="font-size: 20px;font-weight: bold; text-transform: uppercase">{{titreMotif}} .</p>
+      <div class="row">
+        <div class="col-sm-12">{{pageB}}</div>
+      </div><br>
+      <div class="row">
+        <div class="col-sm-5"></div>
+        <div class="col-sm-5">Agent accueil : {{agentAccueil}}&nbsp; </div>
+        <div class="col-sm-2"></div>
+      </div>
+      <hr>
+    </div>
+    <div class="row">
+      <div class="col-sm-3"></div>
+      <div class="col-sm-3"></div>
+      <div class="col-sm-3">
+        <input type="button" (click)="fermer()" value="Fermer" class="btn btn-block btn-info" />
+      </div>
+      <div class="col-sm-3">
+        <input type="button" (click)="imprimer()" value="Imprimer" class="btn btn-block btn-success" />
+      </div>
+    </div>
+    &nbsp;
+  </div>
+</div>
+
+<div *ngIf="showPrint" class="container-fluid">
+  <div class="col-sm-12 content_page">
+    <div>
+      <div class="row">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-3">
+          <h5 class="texte_reglement">
+            <img src="../../assets/img/logo2.png" class="img-responsive logo_menu_haut" style="margin: auto">
+          </h5>
+        </div>
+        <div class="col-sm-8"></div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <h5 class="texte_reglement">Caisse Nationale de Prévoyance Sociale</h5>
+          <div class="row">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-5">
+              <h5 class="texte_reglement">C.N.a.P.S</h5>
+            </div>
+            <div class="col-sm-4"></div>
+          </div>
+          <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-10">
+              <h5 class="texte_reglement">Tél. 22 205 20</h5>
+            </div>
+          </div>
+          <h5 class="texte_reglement">
+            <strong>AMPEFILOHA - ANTANANARIVO</strong>
+          </h5>
+        </div>
+        <div class="col-sm-6"></div>
+      </div>
+      <p style="text-align: center; font-size: 35px;font-weight: bold">{{titre}}</p>
+      <div class="row">
+        <div class="col-sm-12 texte_reglement">
+          <table style="width : 100%;">
+            <tr>
+              <td style="width: 10%;">Réference:</td>
+              <td style="width: 20%;">{{reference}}</td>
+            </tr>
+            <tr>
+              <td style="width: 10%;">Matricule:</td>
+              <td style="width: 20%;">{{matricule}}</td>
+            </tr>
+            <tr>
+              <td style="width: 10%;">Nom:</td>
+              <td style="width: 20%;">{{nom}}</td>
+            </tr>
+            <tr>
+              <td style="width: 10%;">Prénoms:</td>
+              <td style="width: 20%;">{{prenoms}}</td>
+            </tr>
+            <tr *ngIf="bafRet">
+              <td>
+                <table>
+                  <tbody>
+                    <tr *ngFor="let bf of bafRet">
+                      <td>Période : <i>{{ bf.periode}}</i></td>
+                      <td style="padding-left: 100px">Paiement : <i>{{ bf.paiement}}</i></td>
+                      <td style="padding-left: 100px">Folio : {{ bf.folio}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 10%;">Date de réception:</td>
+              <td style="width: 20%;">{{dateReception | date:'dd/MM/yyyy'}}</td>
+            </tr>
+            <tr>
+              <td style="width: 10%;">Demande:</td>
+              <td style="width: 20%;">{{typeDemande}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div *ngIf="size != 0">
+        <div class="row">
+          <div class="col-sm-2">
+            <h6>
+              <strong class="col-form-label texte-content">{{pcsrecu}}</strong>
+            </h6>
+          </div>
+          <div class="col-sm-2">
+            <h6>
+              <strong class="col-form-label texte-content">{{pcsretourn}}</strong>
+            </h6>
+          </div>
+          <div class="col-sm-10"></div>
+        </div><br>
+        <div class="row">
+          <div class="col-sm-2"></div>
+          <div class="col-sm-10">
+            <ul *ngFor="let piece of listePieces; let i = index">
+              <li>{{piece}}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <app-loader [show]="loaderPiece"></app-loader>
+        </div>
+      </div>
+      <div *ngIf="sizeP != 0">
+        <div class="row">
+          <div class="col-sm-4">
+            <h6>
+              <strong class="col-form-label">Pièce(s) reçue(s)</strong>
+            </h6>
+          </div>
+          <div class="col-sm-8"></div>
+        </div><br>
+        <div class="row">
+          <div class="col-sm-2"></div>
+          <div class="col-sm-10">
+            <ul *ngFor="let piece of pieceJointe; let i = index">
+              <li>{{piece.name}}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <p style="font-size: 20px;font-weight: bold; text-transform: uppercase">{{titreMotif}} .</p>
+      <div class="row">
+        <div class="col-sm-12">{{pageB}}</div>
+      </div>
+      <div class="row">
+        <div class="col-sm-5"></div>
+        <div class="col-sm-5">Agent accueil : {{agentAccueil}}&nbsp; </div>
+        <div class="col-sm-2"></div>
+      </div>
+      <hr>
+    </div>
+    &nbsp;
+  </div>
+  &nbsp;
+</div>

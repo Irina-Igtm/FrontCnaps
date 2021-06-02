@@ -1,0 +1,104 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header card-header-info">
+            <h4 class="card-title" style="text-align: center;">Liste des demandes Indeminité Journalière deuxième
+              tranche </h4>
+          </div>
+          <div class="row">
+            <div class="col-md-4 form-group">
+              <label class="col-sm-6 col-form-label texte-content">Etat</label>
+              <div class="col-sm-6">
+                <select (change)="onChange($event)" [(ngModel)]="etat" name="etat" class="form-control">
+                  <option value="0"></option>
+                  <option *ngFor="let a of listEtatDmdIj; let i = index;" value="{{a.id_type_etat}}">{{a.libelle}}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4 form-group">
+              <label></label>
+              <a [routerLink]="['/op-ij2']" class="btn btn-info">Voir la file d'attente pour un OP</a>
+            </div>
+            <div class="col-md-4 form-group">
+            </div>
+
+            <div class="col-md-4 form-group">
+              <mat-form-field class="example-full-width">
+              <input matInput type="text" class="form-control" [(ngModel)]="filtre.matricule"
+                (keyup.enter)="filtreChange('surMatr')" style="width: 100%;" placeholder="Recherche par matricule">
+              </mat-form-field>
+              </div>
+            <div class="col-md-4 form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput type="text" class="form-control" [(ngModel)]="filtre.reference"
+                  (keyup.enter)="filtreChange('surRef')" style="width: 100%;" placeholder="Recherche par référence">
+              </mat-form-field>
+            </div>
+            <div class="col-md-4 form-group">
+              <mat-form-field class="example-full-width">
+              <input matInput type="date" class="form-control" [(ngModel)]="filtre.dateReception"
+                (ngModelChange)="filtreChange('surDateRec')" style="width: 100%;"
+                placeholder="Recherche par date réception">
+              </mat-form-field>
+              </div>
+            <div class="col-md-2 form-group"></div>
+            <div class="col-md-4 form-group">
+              <mat-form-field class="example-full-width">
+              <input matInput type="text" class="form-control" [(ngModel)]="filtre.nom" (keyup.enter)="filtreChange('surNom')"
+                title="Veuillez entrer au moins 6 caractère" style="width: 100%;" placeholder="Recherche par nom">
+              </mat-form-field>
+              </div>
+            <div class="col-md-4 form-group">
+              <mat-form-field class="example-full-width">
+              <input matInput type="text" class="form-control" [(ngModel)]="filtre.prenom"
+                (keyup.enter)="filtreChange('surPrenom')" title="Veuillez entrer au moins 6 caractère"
+                style="width: 100%;" placeholder="Recherche par Prénom">
+              </mat-form-field>
+              </div>
+            <div class="col-md-2 form-group"></div>
+
+          </div>
+          <div class="row">
+            <div *ngIf="!show" style="width: 100%">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <td>Date de réception</td>
+                    <td>Référence de la demande</td>
+                    <td>Matricule travailleur</td>
+                    <td>Nom et Prénom</td>
+                    <td>Etat demande</td>
+                    <td></td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let dmd of listDmdIj">
+                    <td>{{dmd.date_dossier | date:'dd/MM/yyyy'}}</td>
+                    <td>{{dmd.id_acc}}</td>
+                    <td>{{dmd.id_individu}}</td>
+                    <td>{{dmd.nom}} {{dmd.prenoms}}</td>
+                    <td>{{dmd.libelle_etat}}</td>
+                    <td>
+                      <button (click)="onClickIJDetails(dmd.id_acc)" class="btn btn1 btn-block">Voir détails</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <nav aria-label="Page navigation example">
+                <ngb-pagination class="d-flex justify-content-center" [pageSize]="max" [collectionSize]="max * nbPage"
+                  [(page)]="page" aria-label="asdf" [boundaryLinks]="true" [rotate]="true" [maxSize]="10"
+                  (pageChange)="changeValue($event)"></ngb-pagination>
+              </nav>
+            </div>
+            <div *ngIf="show" style="margin: auto">
+              <div class="loader" style="margin: auto"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

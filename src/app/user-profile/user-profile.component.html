@@ -1,0 +1,598 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header card-header-info">
+            <h4 class="card-title" style="text-align: center;">Demande Indemnité Journalière 2ème tranche</h4>
+            <h5 class="card-title" style="text-align: center;" *ngIf="referenceDemandeIj"> Reference:
+              {{referenceDemandeIj}}</h5>
+            <p class="card-category">Veuillez completer les formlaires</p>
+          </div>
+          <div class="card-body">
+            <form>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Matricule" type="text" (keyup.enter)="valideMatricule($event)">
+                  </mat-form-field>
+                </div>
+
+              </div>
+              <!--Verif-->
+              <div *ngIf="refuseDmd">
+                <h4 class="text-danger"> Impossible de procéder à la demande car le matricule entrée correspond à un
+                  homme!</h4>
+                <h4 class="text-success">(Veuillez entrer un matricule à une femme) </h4>
+              </div>
+              <ng-container *ngIf="accesindiv">
+                <div class="row">
+                  <div class="col-md-6">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Nom" type="text" value="{{individu.nom}}">
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Prenom" type="text" value="{{individu.prenoms}}">
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Sexe" type="text" value="{{individu.sexe}}">
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Date de naissance" type="text"
+                        value="{{individu.date_naissance | date: 'dd/MM/yyyy'}}">
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Profession" type="text" value="{{individu.profession}}">
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Nationalite" type="text" value="{{individu.nationalite}}">
+                    </mat-form-field>
+                  </div>
+                </div>
+              </ng-container>
+
+              <!-- FAMILLE -->
+              <!-- <div class="row" *ngIf="famille">
+              <div class="col-md-8">
+                <div class="card">
+                  <div class="card-header card-header-info">
+                    <h4 class="card-title" style="text-align: center;">Informations Conjoint</h4>
+                  </div>
+                  <div class="card-body">
+                    <form>
+                 <div class="table-responsive">
+                   <table class="table table-hover table-sm">
+                     <thead>
+                       <th>Matricule</th>
+                       <th>Statut</th>
+                       <th>Nom</th>
+                       <th>Prenom</th>
+                       <th>Date de naissance</th>
+                     </thead>
+                     <tbody>
+                       <tr *ngFor="let item of famille" >
+                         <td>{{item.matricule}}</td>
+                         <td>{{item.statut}}</td>
+                         <td>{{item.nom}}</td>
+                         <td>{{item.prenom}}</td>
+                         <td>{{item.datenaissance}}</td>
+                       </tr>
+                     </tbody>
+                   </table>
+                 </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>-->
+
+
+              <!--%IJ1-->
+              <div class="row" *ngIf="!ij1">
+                <div class="col-md-12" style="text-align: center;">
+                  <label for="error">
+                    <h3 style="color: red;">
+                      Information du demande Indemnité Journalère 1er tranche obligatoire
+                    </h3>
+                  </label>
+                </div>
+              </div>
+              <div class="row" *ngIf="ij1 && !showIj1">
+                <div class="col-md-12" style="text-align: center;">
+                  <label style="color: blue;">Information demande IJ1</label>
+                </div>
+                <div class="col-md-6">
+                  <label for="ref"> Reference demande IJ1</label>
+                  <mat-form-field class="example-full-width">
+                    <input matInput type="text" [(value)]="ancien.id_acc" readonly>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                  <label for="ref"> Date dossier</label>
+                  <mat-form-field class="example-full-width">
+                    <input matInput type="text" [(value)]="ancien.date_dossier" readonly>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                  <label for="ref"> Etat du demande</label>
+                  <mat-form-field class="example-full-width">
+                    <input matInput type="text" [(value)]="ancien.etat" readonly>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                  <label for="ref"> Observation</label>
+                  <mat-form-field class="example-full-width">
+                    <input matInput type="text" [(value)]="ancien.observations" readonly>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                  <label for="ref"> Droit IJ1</label>
+                  <mat-form-field class="example-full-width">
+                    <input matInput type="text" value="{{ancien.ij1  | number:'1.2-2':'fr'}}" readonly>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="row" *ngIf="showIj1">
+                <div class="loader2"></div>
+              </div>
+              <div class="clearfix"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-profile">
+          <div class="card-avatar">
+            <a href="javascript:void(0)">
+              <img class="img" src="../../assets/img/logo1.png" />
+            </a>
+          </div>
+          <div class="card-body">
+            <h6 class="card-category text-gray">Demandeur</h6>
+            <h4 class="card-title">Information Supplementaire</h4>
+            <p class="card-description" style="text-align: center; color: blue;">
+              Adresse Individu </p>
+            <div class="col-md-12" style="text-align: left;" *ngIf="adresse  && !showAdresse">
+              <b>Lot</b> : {{adresse[0].adresse_lot}} <br>
+              <b>Fokotany</b> : {{adresse[0].adresse_quartier}} <br>
+              <b>Telephone</b> : {{adresse[0].adresse_telephone}} <br>
+              <b>E-mail</b> : {{adresse[0].adresse_e_mail}} <br>
+              <b>Date Adresse</b> : {{adresse[0].adresse_date | date: 'dd/MM/yyyy'}} <br>
+            </div>
+            <div class="row" *ngIf="showAdresse">
+              <div class="loader"></div>
+            </div>
+            <button class="btn btn-info btn-round" (click)="showModalAdresse()">Ajouter adresse</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- FAMILLE -->
+    <div class="row" *ngIf="famille">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header card-header-info">
+            <h4 class="card-title" style="text-align: center;">Informations famille(s)</h4>
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                  <thead>
+                    <th>Matricule</th>
+                    <th>Statut</th>
+                    <th>Nom</th>
+                    <th>Prenom</th>
+                    <th>Date de naissance</th>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of famille">
+                      <td>{{item.matricule}}</td>
+                      <td>{{item.statut}}</td>
+                      <td>{{item.nom}}</td>
+                      <td>{{item.prenom}}</td>
+                      <td>{{item.datenaissance}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEUR -->
+
+    <div class="row" *ngIf="listeEmpl">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header card-header-info">
+            <h4 class="card-title" style="text-align: center;">Informations Employeurs</h4>
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                  <thead>
+                    <th style="size: 5%;"></th>
+                    <th>Nom employeur</th>
+                    <th>Date d'embauche</th>
+                    <th>Date de debauche</th>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let empl of listeEmpl">
+                      <td><input type="radio" (change)="employeurChange(empl)"></td>
+                      <td>{{empl.sig.nom}}</td>
+                      <td>{{empl.sig.date_debut_contrat}}</td>
+                      <td>{{empl.sig.date_fin_contrat}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- MODE DE PAYEMENT -->
+    <div class="row" *ngIf="listeMP">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header card-header-info">
+            <h4 class="card-title" style="text-align: center;">Informations Mode de payement</h4>
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                  <thead>
+                    <th style="size: 5%;"></th>
+                    <th>Type </th>
+                    <th>Banque</th>
+                    <th>Agence</th>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let mp of listeMP">
+                      <td><input type="radio" (change)="modePaiementChange(mp)"></td>
+                      <td>{{mp.type_mdp}}</td>
+                      <td>{{mp.banque}}</td>
+                      <td>{{mp.agence}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <button class="btn btn-info btn-block" (click)="showModalMP()">Ajouter</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- INFO DEMANDE IJ1 -->
+    <div class="row" *ngIf="ancien.dpa">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header card-header-info">
+            <h4 class="card-title" style="text-align: center;">Droit IJ1 et informations Supplementaires</h4>
+          </div>
+          <div class="card-body">
+            <form>
+
+              <div class="row">
+                <div class="col-md-6">
+
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Date d'arret de travail" type="text" value="{{ancien.dat}}" readonly>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Date probable d'accouchemnt" value="{{ancien.dpa}}" type="text"
+                      readonly>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="date debut prenatale" type="text" readonly
+                      value="{{ancien.date_debut_prenatale | date : 'dd/MM/yyyy'}}">
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Date debut postnatale" readonly
+                      value="{{ancien.date_debut_postnatale | date : 'dd/MM/yyyy'}}" type="text">
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Date fin postnatale" readonly
+                      value="{{ancien.date_fin_postnatale | date : 'dd/MM/yyyy'}}" type="text">
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Dernier salaire mensuel" readonly
+                      value="{{ancien.salaire  | number:'1.2-2':'fr'}}" type="text">
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Demi-salaire" readonly
+                      value="{{ancien.demisalaire  | number:'1.2-2':'fr'}}" type="text">
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Droit prenatale" readonly
+                      value="{{ancien.prenatale  | number:'1.2-2':'fr'}}" type="text">
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Droit postnatale" readonly
+                      value="{{ancien.postnatale  | number:'1.2-2':'fr'}}" type="text">
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Nombre de jour prenatale" readonly value="{{ancien.nbjourpre}}"
+                      type="text">
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Droit postnatale" readonly value="{{ancien.nbjourpost}}" type="text">
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <input placeholder="Pieces justificatives--" class="form-control" required type="file">
+                </div>
+              </div>
+
+
+              <div class="row" *ngIf="showIj1">
+                <div class="loader2"></div>
+              </div>
+              <button mat-raised-button type="submit" class="btn btn-success pull-right"
+                (click)="ValideSaveDemande()">Enregistrer</button>
+              <div class="clearfix"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ACCUSE -->
+<div #ajputAdresse class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Ajouter nouveau adresse</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-10 form-group">
+            <div class="col-md-4">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Numero" type="text" [(ngModel)]="numero" required>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-12 form-group">
+            <div class="col-md-4">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Libelle" type="text" [(ngModel)]="libelle" required>
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Adresse quartier" type="text" [(ngModel)]="quartier" required>
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Adresse Email" type="text" [(ngModel)]="adresse_e_mail" required>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-12 form-group">
+            <div class="col-md-6">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Adresse fax" type="text" [(ngModel)]="adresse_fax" required>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-12 form-group">
+            <div class="col-md-6">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Adresse Telephone" type="text" [(ngModel)]="adresse_telephone" required>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- <div class="col-12 form-group">
+            <div class="col-md-6">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Fokontany" type="text" [(ngModel)]="fokontany" required>
+              </mat-form-field>
+            </div>
+          </div> -->
+          <div class="col-sm-4">
+            <div class="form-group row">
+              <label for="fokontany" class="col-sm-6 col-form-label texte-content">Fokontany</label>
+              <div class="col-sm-6">
+                <ngx-select id="fokontany" [items]="itemsFokotany" [(ngModel)]="fokontany" name="fokontany"
+                  (typed)="inputTyped('ngx-select', $event)">
+                </ngx-select>
+
+              </div>
+            </div>
+          </div>
+          <div class="col-12 form-group">
+            <div class="col-md-6">
+              <ngx-select placeholder="Type" [items]="items" [(ngModel)]="type_adresse"></ngx-select>
+            </div>
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="row interligne">
+              <div class="col-6"></div>
+              <div class="col-3">
+                <button class="btn btn-danger btn-block" data-dismiss="modal">Annuler</button>
+              </div>
+              <div class="col-3" *ngIf="!showSaveAddresse">
+                <button class="btn btn-info btn-block" (click)="ajoutAdresse()">Enregistrer</button>
+              </div>
+              <div class="col-3" *ngIf="showSaveAddresse">
+                <div class="loader"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- MODAL ACCUSE -->
+<div #matricule class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Accusé de réception</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-12 form-group">
+            <strong>Voulez-vous recevoir l'accusé?</strong>
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="row interligne">
+              <div class="col-6"></div>
+              <div class="col-3">
+                <button class="btn btn4 btn-block" type="button" (click)="hideModalAR()">NON</button>
+              </div>
+              <div class="col-3">
+                <button class="btn btn-appro btn-block" data-dismiss="modal" (click)="accuse()">OUI</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+    </div>
+  </div>
+</div>
+
+<!--Pièces justificatives-->
+
+<!-- MODAL ACCUSE -->
+<div #modalMP class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Ajouter nouveau Mode de payement</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-12 form-group">
+            <div class="col-md-6">
+              <ngx-select placeholder="Type" [items]="modeP" [(ngModel)]="mp.type_mdp"></ngx-select>
+            </div>
+          </div>
+          <div class="col-10 form-group" *ngIf = "mp.type_mdp == 'mobile'">
+            <div class="col-md-4">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Numero telephone" type="text" [(ngModel)]="mp.numero" required>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-12 form-group" *ngIf = "mp.type_mdp == 'virement'">
+            <div class="col-md-4">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Banque" type="text" [(ngModel)]="mp.banque" required>
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Agence" type="text" [(ngModel)]="mp.agence" required>
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Numero de compte" type="text" [(ngModel)]="mp.numero_cmpt" required>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="row interligne">
+              <div class="col-6"></div>
+              <div class="col-3">
+                <button class="btn btn-danger btn-block" data-dismiss="modal">Annuler</button>
+              </div>
+              <div class="col-3" *ngIf="!showSaveAddresse">
+                <button class="btn btn-info btn-block" (click)="ajouterMP()">Enregistrer</button>
+              </div>
+              <div class="col-3" *ngIf="showSaveAddresse">
+                <div class="loader"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+    </div>
+  </div>
+</div>
