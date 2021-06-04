@@ -76,6 +76,7 @@
               <td style="width: 10%;">Demande:</td>
               <td style="width: 20%;">{{typeDemande}}</td>
             </tr>
+            <ng-container *ngIf="modePaiement">
             <tr>
               <td style="width: 10%;">Mode de paiement:</td>
               <td style="width: 20%;">{{modePaiement}}</td>
@@ -92,6 +93,7 @@
               <td style="width: 10%;">Numéro de compte:</td>
               <td style="width: 20%;">{{numCompte}}</td>
             </tr>
+          </ng-container>
           </table>
         </div>
       </div>

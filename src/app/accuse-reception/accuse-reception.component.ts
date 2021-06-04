@@ -75,7 +75,7 @@ export class AccuseReceptionComponent implements OnInit {
           this.prenoms = data.body['prenom'];
           this.typeDemande = data.body['typeDemande'];
           let user = JSON.parse(localStorage.getItem('user')).id_acces;
-          this.ij2srvc.infoIndivWebService(user).subscribe(dataI => {
+          this.ij2srvc.infoIndivWebService(user, this.idToken).subscribe(dataI => {
             if (dataI.status == 200) {
               this.agentAccueil = dataI.body['nom'] + ' ' + dataI.body['prenoms'];
             }
@@ -123,7 +123,10 @@ export class AccuseReceptionComponent implements OnInit {
             this.pageB = ' << Ny valin\'ny fangatahanao dia azonao anontaniana eny amin\'ny biraon\'ny CNaPS akaiky anao afaka fito andro fiasana >>';
           }
         }
+        console.log("PAGEB" , this.pageB);
       });
+      console.log("PAGEB" , this.pageB);
+      
       const dateToday = this.datePipe.transform(new Date(Date.now()), 'yyyy-MM-dd');
       // this.dateReception = JSON.parse(localStorage.getItem('stock')).accueilMod.date_dossier;
       this.dateReception = dateToday;

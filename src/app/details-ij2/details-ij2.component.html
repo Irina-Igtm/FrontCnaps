@@ -1,0 +1,1339 @@
+<div *ngIf="!enPDF" class="container-fluid">
+    <div class="col-sm-12 content_page">
+        <div class="row titre_pf">
+            <h4>Détails indemnité journalière deuxième tranche</h4>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <h4 class="text-center">Ref - {{idDmdIJ}}</h4>
+            </div>
+            <div class="col-md-5"></div>
+            <div *ngIf="etat.id_type_etat!==3" class="col-sm-2"
+                style="font-weight:bold;background:#e6e6e6;color: black;border-radius:2px;padding: 8px 12px;box-shadow: 0 1px 4px 0 rgba(0,0,0,.2)">
+                <h4 style="font-size: 17px;" class="text-center">
+                    {{etat.libelle}}</h4>
+            </div>
+            <div *ngIf="etat.id_type_etat===3" class="col-sm-2"
+                style="background:#28a745;color: white;padding: 8px;box-shadow: 1px 1px 12px #999">
+                <h4 style="font-size: 17px;" class="text-center"><i class="fa fa-check"> </i> {{etat.libelle}}</h4>
+            </div>
+            <br>
+            <div class="col-md-5"></div>
+
+            <div class="col-md-12">
+                <ng-container *ngIf="accesindiv">
+                <div class="row">
+                  <div class="col-md-6">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Nom" type="text" value="{{individu.nom}}">
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Prenom" type="text" value="{{individu.prenoms}}">
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Sexe" type="text" value="{{individu.sexe}}">
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Date de naissance" type="text"
+                        value="{{individu.date_naissance | date: 'dd/MM/yyyy'}}">
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Profession" type="text" value="{{individu.profession}}">
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Nationalite" type="text" value="{{individu.nationalite}}">
+                    </mat-form-field>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+            <br>
+        </div>
+        <hr>
+        <br>
+
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#infoDemande">Info demande</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#infoIndiv">Info individu</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#infoEnfant">Info enfant(s)</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#infoEmpl">Info employeur</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#infoMp">Info Mode de Paiement</a>
+            </li>
+        </ul>
+
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+
+            <!-- INFO DEMANDE -->
+            <div class="tab-pane active" style="background: #f2f2f2;padding: 15px;" id="infoDemande">
+                <!-- INFO -->
+                <br>
+                <div class="panel">
+                    <div class="panel-body">
+                        <fieldset class="col-md-12">
+                            <legend>Informations IJ1</legend>
+                            <div class="panel">
+                                <div class="panel-body">
+                                    <form>
+                                        <div class="row">
+                                            <div class="col-sm-12" *ngFor="let input of inputs">
+                                                <app-dynamic-input [input]="input" [form]="ijForm"></app-dynamic-input>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <div class="col-sm-12">
+                                                    <div class="row">
+                                                        <div class="col-sm-4 texte-content">DPA :</div>
+                                                        <div class="col-sm-8 texte-content">
+                                                            <label class="form-control">{{dpa |
+                                                                date:'dd/MM/yyyy'}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12" style="margin-top: 15px;">
+                                                <div class="col-sm-12">
+                                                    <div class="row">
+                                                        <div class="col-sm-4 texte-content">Date d'arrêt :</div>
+                                                        <div class="col-sm-8 texte-content">
+                                                            <label *ngIf="decompteIj2"
+                                                                class="form-control">{{dateArretTravail |
+                                                                date:'dd/MM/yyyy'}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                            <div class="col-sm-4">
+                                                <app-modif-info-recu-pf
+                                                    *ngIf="idDmdIJ && etat && etat.id_type_etat !== 3"
+                                                    [referenceDmd]="idDmdIJ" (modifTermine)="modifTermine($event)">
+                                                </app-modif-info-recu-pf>
+                                                <!--<button *ngIf="cant_validate==true" type="submit"
+                          class="btn btn-success btn-block">Modifier</button>-->
+                                            </div>
+                                            <div *ngIf="showModif" class="col-sm-4">
+                                                <div class="loader"></div>
+                                            </div>
+                                            <div class="col-sm-10"></div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </fieldset>
+
+                        <div class="clearfix"></div>
+                    </div>
+
+                </div>
+
+                <!-- DROIT -->
+                <div *ngIf="!estMontantSalaireZero" class="row">
+                    <div class="col-md-12">
+                        <br>
+                        <div class="panel">
+                            <div class="panel-body">
+                                <fieldset class="col-md-12">
+                                    <legend><i class="far fa-money-bill-alt"></i> Droit</legend>
+                                    <div class="panel">
+                                        <div class="panel-body">
+                                            <div class="row interligne">
+                                                <div class="col-md-4">
+                                                    <div class="col-md-10">
+                                                        <label class="control-label texte-content" for="typeArret">Date
+                                                            d'arrêt:</label>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <input type="text"
+                                                            value="{{decompteIj2.date_debut_prenatale | date : 'dd/MM/yyyy'}}"
+                                                            class="form-control" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="col-md-10">
+                                                        <label class="control-label texte-content" for="typeArret">Date
+                                                            de naissance:</label>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <input type="text" class="form-control"
+                                                            value="{{decompteIj2.dac | date : 'dd/MM/yyyy'}}" readonly>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="col-md-12">
+                                                        <label class="control-label texte-content"
+                                                            for="typeArret">Nombre de jours prénatal</label>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <input type="text" value="{{decompteIj2.nbjourpre}}"
+                                                            class="form-control" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row interligne">
+                                                <div class="col-md-4">
+                                                    <div class="col-md-12">
+                                                        <label class="control-label texte-content" for="typeArret">Début
+                                                            période postnatal</label>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <input type="text"
+                                                            value="{{decompteIj2.date_debut_postnatale | date : 'dd/MM/yyyy'}}"
+                                                            class="form-control" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="col-md-10">
+                                                        <label class="control-label texte-content" for="typeArret">Fin
+                                                            période postnatal</label>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <input type="text"
+                                                            value="{{decompteIj2.date_fin_postnatale | date : 'dd/MM/yyyy'}}"
+                                                            class="form-control" readonly>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="col-md-12">
+                                                        <label class="control-label texte-content"
+                                                            for="typeArret">Nombre de jours postnatal</label>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <input type="text" value="{{decompteIj2.nbjourpost}}"
+                                                            class="form-control" readonly>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="row interligne">
+                                                <div class="col-md-4">
+                                                    <div class="col-md-10">
+                                                        <label class="control-label texte-content"
+                                                            for="typeArret">Reprise de travail</label>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <input type="text" class="form-control"
+                                                            value="{{decompteIj2.drt | date : 'dd/MM/yyyy'}}" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="col-md-10">
+                                                        <label class="control-label texte-content" for="typeArret">Total
+                                                            jours:</label>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <input type="text" value="{{decompteIj2.totalNbJours}}"
+                                                            class="form-control" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="col-md-10">
+                                                        <label class="control-label texte-content"
+                                                            for="typeArret">Nombre de jours IJ1 (Avec avance
+                                                            postnatal)</label>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <input type="text" class="form-control"
+                                                            value="{{decompteIj2.nbjourIJ1}}" readonly>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div *ngIf="!estRedressement" class="row interligne">
+                                                <div class="col-md-4">
+                                                    <div class="col-md-10">
+                                                        <label class="control-label texte-content"
+                                                            for="typeArret">Montant droit:</label>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <input type="text"
+                                                            value="{{decompteIj2.montantDroit | number:'1.2-2':'fr'}}"
+                                                            class="form-control" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="col-md-10">
+                                                        <label class="control-label texte-content"
+                                                            for="typeArret">Montant droit IJ1:</label>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <input type="text"
+                                                            value="{{decompteIj2.postnatale| number:'1.2-2':'fr'}}"
+                                                            class="form-control" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br>
+                                            <div *ngIf="estRedressement" class="col-sm-12">
+                                                <div class="panel">
+                                                    <br><br>
+                                                    <div class="panel-body">
+                                                        <fieldset class="col-md-11">
+                                                            <legend><i class="fas fa-info-circle"></i> REDRESSEMENT
+                                                            </legend>
+                                                            <div class="panel">
+                                                                <div class="panel-body">
+                                                                    <div class="row interligne">
+                                                                        <div class="col-md-4">
+                                                                            <div class="col-md-10">
+                                                                                <label
+                                                                                    class="control-label texte-content"
+                                                                                    for="typeArret">Montant du
+                                                                                    salaire (DNS)</label>
+                                                                            </div>
+                                                                            <div class="col-md-10">
+                                                                                <input type="text" class="form-control"
+                                                                                    value="{{montantSalaire| number:'1.2-2':'fr'}}"
+                                                                                    readonly>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-4"></div>
+                                                                        <div class="col-md-4"></div>
+                                                                    </div>
+                                                                    <div class="row interligne">
+                                                                        <div class="col-md-6">
+                                                                            <div class="col-md-10">
+                                                                                <label
+                                                                                    class="control-label texte-content"
+                                                                                    for="typeArret">Droit 1 ère
+                                                                                    tranche</label>
+                                                                            </div>
+                                                                            <div class="col-md-10">
+                                                                                <input type="text" class="form-control"
+                                                                                    value="{{decompteIj2.redressement.newDroit1tranche | number:'1.2-2':'fr'}}"
+                                                                                    readonly>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <div class="col-md-10">
+                                                                                <label
+                                                                                    class="control-label texte-content"
+                                                                                    for="typeArret">Droit 2 ème
+                                                                                    tranche</label>
+                                                                            </div>
+                                                                            <div class="col-md-10">
+                                                                                <input type="text" class="form-control"
+                                                                                    value="{{decompteIj2.redressement.newDroit2tranche | number:'1.2-2':'fr'}}"
+                                                                                    readonly>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <hr>
+                                                                    <div class="row interligne">
+                                                                        <div
+                                                                            class="col-md-3 control-label texte-content">
+                                                                            Droit total:
+                                                                        </div>
+                                                                        <div class="col-md-4">
+                                                                            <input type="text" class="form-control"
+                                                                                value="{{decompteIj2.redressement.droitTotal | number:'1.2-2':'fr'}}"
+                                                                                readonly>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row interligne">
+                                                                        <div
+                                                                            class="col-md-3 control-label texte-content">
+                                                                            Droit déjà payé 1ère tranche:
+                                                                        </div>
+                                                                        <div class="col-md-4">
+                                                                            <input type="text" class="form-control"
+                                                                                value="{{decompteIj2.redressement.dejaPaye | number:'1.2-2':'fr'}}"
+                                                                                readonly>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row interligne">
+                                                                        <div
+                                                                            class="col-md-3 control-label texte-content">
+                                                                            Reste à payer:
+                                                                        </div>
+                                                                        <div class="col-md-4">
+                                                                            <input type="text" class="form-control"
+                                                                                value="{{decompteIj2.redressement.restePaye | number:'1.2-2':'fr'}}"
+                                                                                readonly>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </fieldset>
+                                                        <div class="clearfix"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="col-md-3">
+                                        <button data-toggle="modal" data-target="#decompte" class="btn"
+                                            style="width:100%;color: white;background: #8a21d3">Décompte</button>
+                                    </div>
+                                </fieldset>
+
+                                <div class="clearfix"></div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div *ngIf="estMontantSalaireZero" class="row">
+                    <div class="col-sm-6">
+                        <div class="panel">
+                            <br><br>
+                            <div class="panel-body">
+                                <fieldset class="col-md-12">
+                                    <legend><i class="fas fa-info-circle"></i> DNS</legend>
+                                    <div class="panel">
+                                        <div class="panel-body" style="background: #e00034;color:white;padding: 5px;">
+                                            <label><b>En attente déclaration nominative des salaires.</b></label>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PIECE -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <br>
+                        <div class="panel">
+                            <div class="panel-body">
+                                <fieldset class="col-md-12">
+                                    <legend><i class="fa fa-paperclip" aria-hidden="true"></i> Pièce(s) justificative(s)
+                                    </legend>
+                                    <div *ngIf="pieces != undefined && pieces.length!==0" class="panel">
+                                        <div class="panel-body">
+                                            <div class="row interligne">
+                                                <div class="col-md-12">
+                                                    <div *ngFor="let piece of pieces">
+                                                        <i class="fa fa-download" style="color:black"></i> <a
+                                                            [href]="sanitize(piece?.file)"
+                                                            style="cursor: pointer;color: rgb(3,158,194)"
+                                                            download='{{piece?.name}}'>{{piece.name}}</a>
+                                                        <br>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="pieces != undefined && pieces.length===0" class="panel">
+                                        <div class="panel-body">
+                                            Aucune pièce trouvée
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NOTIF -->
+                <!-- <div class="row">
+                    <div class="col-md-12">
+                        <br>
+                        <app-notif-activite-dans-dmd *ngIf="dmdIJ" [prestation]="PRESTATION"
+                            [idIndividu]="dmdIJ.accueilMod.id_individu" [idEmpl]="dmdIJ.accueilMod.id_empl"
+                            [dateDepot]="dmdIJ.accueilMod.date_dossier"></app-notif-activite-dans-dmd>
+                    </div>
+                </div> -->
+            </div>
+
+            <!-- INFO INDIVIDU -->
+            <div class="tab-pane fade" id="infoIndiv">
+                <div *ngIf="individu">
+                    <br>
+                    <app-info-indiv-dmd [idIndividu]="individu.id_individu"></app-info-indiv-dmd>
+                </div>
+                <br>
+                <!-- <app-choix-benef *ngIf="individu && dmdIJ" [demandeur]="individu.id_individu"
+                    [idAcc]="dmdIJ.accueilMod.id_acc" [idEmpl]="dmdIJ.accueilMod.id_empl" [etatDmd]="etat.id_type_etat"
+                    (resBenef)="resBenef($event)">
+                </app-choix-benef> -->
+            </div>
+
+            <!-- //INFO ENFANTS -->
+             <!-- <div class="tab-pane fade" id="infoEnfant">
+                <br>
+
+                 <div class="panel">
+                    <br>
+                    <div class="panel-body">
+                        <fieldset class="col-md-12">
+                            <legend><i class="fas fa-file"></i> Historique enfant</legend>
+                            <div class="panel">
+                                <div class="panel-body">
+                                    <app-gestion-enfant *ngIf="id_indiv" [idParent]="id_indiv"
+                                        (enfantsChange)="enfantsChange($event)" [peutDeclarer]="true"
+                                        [peutCocher]="false" [couleur]="couleur"></app-gestion-enfant>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="clearfix"></div>
+                    </div>
+                </div> 
+            </div>  -->
+
+            <!-- INFO EMPLOYEUR -->
+            <div class="tab-pane fade" id="infoEmpl">
+                <br>
+                <app-details-employeurs *ngIf="id_employeur!= null" [idIndividu]="id_indiv"
+                    [idEmplChoisi]="id_employeur">
+                </app-details-employeurs>
+            </div>
+
+            <!-- INFO MODE DE PAIEMENT -->
+            <div class="tab-pane fade" id="infoMp">
+                <app-change-mode-paiement *ngIf="idDmdIJ && individu && afficheChangeMP" [idAcc]="idDmdIJ"
+                    [idIndividu]="individu.id_individu">
+                </app-change-mode-paiement>
+            </div>
+            <hr>
+            <br>
+            <div>
+                <div class="col-sm-12 form-group">
+                    <label class="control-label texte-content">Etats de la demande</label>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Statut</th>
+                                <th>Date</th>
+                                <th>Agent</th>
+                                <th *ngIf="CODE_SERVICE == SEM || CODE_SERVICE == SEM2">Observation SEM</th>
+                                <th>Observation</th>
+                            </tr>
+                        </thead>
+                        <tbody *ngIf="tecInfo">
+                            <tr *ngFor="let e of tecInfo.histoEtatDmd">
+                                <td style="white-space: nowrap;">{{prendEtat(e.etat)}}</td>
+                                <td>{{e.date_modif | date:'dd/MM/yyyy'}}</td>
+                                <td>{{e.user_modif}}</td>
+                                <td *ngIf="CODE_SERVICE == SEM || CODE_SERVICE == SEM2">{{e.observationsSem}}</td>
+                                <td>{{e.observations}}</td>
+                            </tr>
+                            <tr>
+                                <td style="white-space: nowrap;">{{prendEtat(tecInfo.accueilMod.etat)}}</td>
+                                <td *ngIf="tecInfo.accueilMod.date_modif != null">{{tecInfo.accueilMod.date_modif |
+                                    date:'dd/MM/yyyy'}}
+                                </td>
+                                <td *ngIf="tecInfo.accueilMod.date_modif == null">
+                                    {{tecInfo.accueilMod.dateInsertion | date:'dd/MM/yyyy'}}</td>
+                                <td *ngIf="tecInfo.accueilMod.user_modif != null">{{tecInfo.accueilMod.user_modif}}</td>
+                                <td *ngIf="tecInfo.accueilMod.user_modif == null">{{tecInfo.accueilMod.user_insert}}
+                                </td>
+                                <td>{{tecInfo.accueilMod.observations}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- VALIDATION PF -->
+            <div *ngIf="etat.id_type_etat!==8" class="row">
+                <div *ngIf="cant_validate==true" class="col-md-12">
+                    <form (ngSubmit)="onAcceptCLick()" [formGroup]="validForm">
+                        <div class="panel">
+                            <div class="panel-body">
+                                <fieldset class="col-md-12">
+                                    <legend>Conclusion</legend>
+                                    <div class="panel">
+                                        <div class="panel-body">
+                                            <div class="row interligne">
+                                                <div class="col-md-3">
+                                                    <label class="control-label texte-content"
+                                                        for="typeArret">Obsérvation:</label>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <textarea name="observations" formControlName="observations"
+                                                        class="form-control"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </fieldset>
+
+                                <div class="clearfix"></div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-2"></div>
+                                <div class="col-sm-2">
+                                    <a *ngIf="cant_validate==true" [routerLink]="['/ij2-pf']"
+                                        class="btn btn-warning btn-block" style="color: #fff;">Retour</a>
+                                    <br>
+                                </div>
+                                <div class="col-sm-2">
+                                    <a *ngIf="cant_validate==true" class="btn btn4 btn-block" style="color: #fff;"
+                                        data-toggle="modal" data-target="#dossierRefuse">Autres actions</a>
+                                    <br>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div *ngIf="!show">
+                                        <button *ngIf="cant_validate==true" [disabled]="estMontantSalaireZero"
+                                            type="submit" class="btn btn-success btn-block">Valider</button>
+                                    </div>
+                                    <div *ngIf="show">
+                                        <div class="loader"></div>
+                                    </div>
+
+                                    <br>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div *ngIf="dmdIJ && individu" class="col-md-12">
+                    <app-repaiement-droit-aperiodique *ngIf="montantOP > 0 && etat.id_type_etat===3 && DR"
+                        [idAcc]="dmdIJ.accueilMod.id_acc" [droit]="montantOP" [prestation]="PRESTATION"
+                        [idDemandeur]="individu.id_individu" [idEmpl]="dmdIJ.accueilMod.id_empl"
+                        [idSucc]="dmdIJ.accueilMod.id_succursale" [dr]="DR"></app-repaiement-droit-aperiodique>
+                </div>
+            </div>
+
+            <!-- VALIDATION SEM -->
+            <div *ngIf="etat.id_type_etat===8" class="row">
+                <div *ngIf="cant_validate==true" class="col-md-12">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#validSem">
+                        Changer état
+                    </button>
+                </div>
+            </div>
+            <br>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="piecesJointes" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Message</label>
+                    <textarea class="form-control" [(ngModel)]="pieceJointeMessage"
+                        name="pieceJointeMessage"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div *ngIf="!show" class="container-fluid connex_boutton">
+                    <button type="submit" class="btn btn-info" (click)="onPieceJointeClick()">
+                        Envoyer
+                    </button>
+                </div>
+                <div *ngIf="show" class="container-fluid connex_boutton">
+                    <div class="loader"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="dossierRefuse" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Etat</label>
+                    <select (change)="onChangeEtat($event.target)" class="form-control custom-select">
+                        <option></option>
+                        <option *ngFor="let etat of listeAutreEtat" value="{{etat.id_type_etat}}">{{etat.libelle}}
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Observation</label>
+                    <textarea class="form-control" [(ngModel)]="dossierMessage" name="dossierMessage"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Notification <span style="opacity: 0.7;">Vers le (la)
+                            concerné(e)</span></label>
+                    <textarea class="form-control" [(ngModel)]="notification" name="notification"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div *ngIf="!show" class="container-fluid connex_boutton">
+                    <button type="submit" data-dismiss="modal" class="btn btn-info" (click)="dossierRefuse()">
+                        Valider
+                    </button>
+                </div>
+                <div *ngIf="show" class="container-fluid connex_boutton">
+                    <div class="loader"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="!enPDF && !estRedressement" class="modal fade" id="decompte" tabindex="-1" role="dialog"
+    aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div style="max-width: 1200px!important;" class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgb(51, 122, 183);">
+                <h5 class="modal-title" id="exampleModalLabel" style="color: white"><i
+                        style="color:#f8e909;font-size: 22px;" class="far fa-lightbulb"></i>Décompte Droit Indemnité
+                    Journalière Deuxième tranche</h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span style="color: white" aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-8"></div>
+                        <div class="col-sm-4 text-center">Date : {{dateNow | date:'d MMMM y':'':'fr'}}</div>
+                        <div class="col-sm-12"><br><br></div>
+                        <div class="col-sm-12 bas">
+                            <p class="texte-indiv" *ngIf="individu">Mme {{individu.nom}} {{individu.prenoms}}</p>
+                            <p class="texte-indiv" *ngIf="employeur">{{employeur.employeur_nom}}</p>
+                            <p class="texte-indiv" *ngIf="adresseIndividu">{{adresseIndividu.quartier}}
+                                {{adresseIndividu.complement}}
+                            </p>
+                            <p class="texte-indiv"
+                                *ngIf="adresseIndividu && adresseIndividu.fokontany && adresseIndividu.fokontany.firaisana && adresseIndividu.fokontany.firaisana.fivondronana">
+                                {{adresseIndividu.fokontany.firaisana.fivondronana.region.faritany.libelle}}</p>
+                        </div>
+                        <hr>
+                        <div class="col-sm-6" *ngIf="employeur">Employeur : {{employeur.employeur_matricule}}</div>
+                        <div class="col-sm-6">Réf demande : {{idDmdIJ}} </div>
+                        <div class="col-sm-12" *ngIf="individu">N° CNaPS : {{individu.id_individu}}</div>
+                        <div class="col-sm-12"><br></div>
+                        <div class="col-sm-12">
+                            <p>Décompte de droits de MME</p>
+                            <p *ngIf="individu">{{individu.nom}} {{individu.prenoms}}</p>
+                        </div>
+                        <div class="col-sm-12">
+                            <h5 class="titre1"><strong>1 - PERIODE PRENATALE</strong> </h5>
+                            <p>Date d'accouchement : {{decompteIj2.dac | date : 'dd/MM/yyyy'}}</p>
+                            <p>Arrêt de travail : {{decompteIj2.dat | date : 'dd/MM/yyyy'}}</p>
+                            <p>Montant du salaire (Ar) : {{decompteIj2.salaire | number:'1.2-2':'fr'}}</p>
+                            <p>Indemnité journalière (Ar) : {{decompteIj2.postnatale| number:'1.2-2':'fr'}}
+                            </p>
+                            <p>Du {{decompteIj2.date_debut_prenatale | date : 'dd/MM/yyyy'}} Au
+                                {{decompteIj2.dac | date : 'dd/MM/yyyy'}}
+                                Soit {{decompteIj2.nbjourpre}}
+                                Jour(s) X {{decompteIj2.demiSalaire | number:'1.2-2':'fr'}} =
+                                {{decompteIj2.prenatale | number:'1.2-2':'fr'}} Ar.</p>
+                            <h5 class="titre1"><strong> 2- PERIODE POST NATALE</strong> </h5>
+                            <p>Reprise de travail : {{decompteIj2.drt | date : 'dd/MM/yyyy'}}</p>
+                            <p>Du {{decompteIj2.date_debut_postnatale | date : 'dd/MM/yyyy'}} Au
+                                {{decompteIj2.date_fin_postnatale | date : 'dd/MM/yyyy'}}
+                                Soit {{decompteIj2.nbjourpost}} Jour(s) X {{decompteIj2.demiSalaire |
+                                number:'1.2-2':'fr'}} =
+                                {{decompteIj2.postnatale | number:'1.2-2':'fr'}} Ar.
+                            </p>
+                        </div>
+                        <div class="col-sm-12">
+                            <h5 class="titre1"><strong> 3- PROLONGATION</strong> </h5>
+                            <p>Du {{decompteIj2.prolongation.date_debut_prolongation | date : 'dd/MM/yyyy'}} au
+                                {{decompteIj2.prolongation.date_fin_prolongation | date : 'dd/MM/yyyy'}}
+                                = {{decompteIj2.prolongation.nbprolongation}} Jour(s)</p>
+                            <hr>
+                        </div>
+                        <div class="col-sm-6"></div>
+                        <div class="col-sm-6 marge">
+                            <div class="row">
+                                <div class="col-sm-6">Total :</div>
+                                <div class="col-sm-6 text-right">
+                                    {{decompteIj2.nbjourpre+decompteIj2.nbjourpost+decompteIj2.prolongation.nbprolongation}}
+                                    Jour(s)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6"></div>
+                                <div class="col-sm-6"><strong>-</strong></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">Déja payé :</div>
+                                <div class="col-sm-6 text-right"> {{decompteIj2.nbjourIJ1}} jour(s) </div>
+                            </div>
+                            <hr>
+                        </div>
+                        <div class="col-sm-6"></div>
+                        <div class="col-sm-6 marge">
+                            <div class="row">
+                                <div class="col-sm-6">Reste à payer :</div>
+                                <div class="col-sm-6 text-right">
+                                    {{decompteIj2.nbjourpre + decompteIj2.nbjourpost +
+                                    decompteIj2.prolongation.nbprolongation - decompteIj2.nbjourIJ1}}
+                                    jour(s)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6"></div>
+                                <div class="col-sm-6"><strong>x</strong></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6"></div>
+                                <!-- <div class="col-sm-6 text-right">{{decompteIj2.demiSalaire}} Ar</div> -->
+                                <div class="col-sm-6 text-right">
+                                    {{decompteIj2.demiSalaire | number:'1.2-2':'fr'}} Ar</div>
+                            </div>
+                            <hr>
+                        </div>
+                        <div class="col-sm-6"></div>
+                        <div class="col-sm-6 marge">
+                            <!-- <p class="text-right">
+                {{(decompteIj2.nbjourpre+decompteIj2.nbjourpost-decompteIj2.nbjourIJ1)*decompteIj2.demiSalaire}}
+              </p> -->
+                            <p class="text-right">
+                                {{decompteIj2.montantDroit | number:'1.2-2':'fr'}}
+                            </p>
+                        </div>
+                        <div class="col-sm-6"></div>
+                        <div class="col-sm-6 marge">
+                            <div class="row">
+                                <div class="col-sm-6">Net à payer : </div>
+                                <div class="col-sm-6 text-right tout">
+                                    <!--   <strong>{{(decompteIj2.nbjourpre+decompteIj2.nbjourpost+decompteIj2.prolongation.nbprolongation-decompteIj2.nbjourIJ1)*decompteIj2.demiSalaire}}
+                    Ar
+                  </strong> -->
+                                    <strong>{{decompteIj2.montantDroit | number:'1.2-2':'fr'}}
+                                        Ar
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br><br>
+                    <div class="row">
+                        <div class="col-sm-10"></div>
+
+                        <div class="col-sm-2"><input type="button" (click)="imprimerPDF()" value="Imprimer"
+                                class="btn btn-block btn4" /><br>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+            </div>
+            <br>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="!enPDF && estRedressement" class="modal fade" id="decompte" tabindex="-1" role="dialog"
+    aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div style="max-width: 1200px!important;" class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgb(51, 122, 183);">
+                <h5 class="modal-title" id="exampleModalLabel" style="color: white"><i
+                        style="color:#f8e909;font-size: 22px;" class="far fa-lightbulb"></i>Décompte Droit Indemnité
+                    Journalière Deuxième tranche</h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span style="color: white" aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-8"></div>
+                        <div class="col-sm-4 text-center">Date : {{dateNow | date:'d MMMM y':'':'fr'}}</div>
+                        <div class="col-sm-12"><br><br></div>
+                        <div class="col-sm-12 bas">
+                            <p class="texte-indiv" *ngIf="individu">Mme {{individu.nom}} {{individu.prenoms}}</p>
+                            <p class="texte-indiv" *ngIf="employeur">{{employeur.employeur_nom}}</p>
+                            <p class="texte-indiv" *ngIf="adresseIndividu">{{adresseIndividu.quartier}}
+                                {{adresseIndividu.complement}}
+                            </p>
+                            <p class="texte-indiv" *ngIf="adresseIndividu">
+                                {{adresseIndividu.fokontany.firaisana.fivondronana.region.faritany.libelle}}</p>
+                        </div>
+                        <hr>
+                        <div class="col-sm-6" *ngIf="employeur">Employeur : {{employeur.employeur_matricule}}</div>
+                        <div class="col-sm-6">Réf demande : {{idDmdIJ}} </div>
+                        <div class="col-sm-12" *ngIf="individu">N° CNaPS : {{individu.id_individu}}</div>
+                        <div class="col-sm-12"><br></div>
+                        <div class="col-sm-12">
+                            <p>Décompte de droits de MME</p>
+                            <p *ngIf="individu">{{individu.nom}} {{individu.prenoms}}</p>
+                        </div>
+                        <div class="col-sm-12">
+                            <h5 class="titre1"><strong>1 - PERIODE PRENATALE</strong> </h5>
+                            <p>Date d'accouchement : {{decompteIj2.dac | date : 'dd/MM/yyyy'}}</p>
+                            <p>Arrêt de travail : {{decompteIj2.dat | date : 'dd/MM/yyyy'}}</p>
+                            <p>Montant du salaire (Ar) : {{montantSalaire | number:'1.2-2':'fr'}}</p>
+                            <p>Indemnité journalière (Ar) :
+                                {{decompteIj2.redressement.dejaPaye | number:'1.2-2':'fr'}}</p>
+                            <p>Du {{decompteIj2.date_debut_prenatale | date : 'dd/MM/yyyy'}} Au
+                                {{decompteIj2.dac | date : 'dd/MM/yyyy'}}
+                                Soit {{decompteIj2.nbjourpre}}
+                                Jour(s) X {{decompteIj2.demiSalaire | number:'1.2-2':'fr'}} =
+                                {{decompteIj2.prenatale | number:'1.2-2':'fr'}} Ar.</p>
+                            <h5 class="titre1"><strong> 2- PERIODE POST NATALE</strong> </h5>
+                            <p>Reprise de travail : {{decompteIj2.drt | date : 'dd/MM/yyyy'}}</p>
+                            <p>Du {{decompteIj2.date_debut_postnatale | date : 'dd/MM/yyyy'}} Au
+                                {{decompteIj2.date_fin_postnatale | date : 'dd/MM/yyyy'}}
+                                Soit {{decompteIj2.nbjourpost}} Jour(s) X {{decompteIj2.demiSalaire |
+                                number:'1.2-2':'fr'}} =
+                                {{decompteIj2.postnatale | number:'1.2-2':'fr'}} Ar.
+                            </p>
+                        </div>
+                        <div class="col-sm-12">
+                            <h5 class="titre1"><strong> 3- PROLONGATION</strong> </h5>
+                            <p>Du {{decompteIj2.prolongation.date_debut_prolongation | date : 'dd/MM/yyyy'}} au
+                                {{decompteIj2.prolongation.date_fin_prolongation | date : 'dd/MM/yyyy'}}
+                                = {{decompteIj2.prolongation.nbprolongation}} Jour(s)</p>
+                            <hr>
+                        </div>
+                        <div class="col-sm-6"></div>
+                        <div class="col-sm-6 marge">
+                            <div class="row">
+                                <div class="col-sm-6">Total :</div>
+                                <div class="col-sm-6 text-right">
+                                    {{decompteIj2.nbjourpre+decompteIj2.nbjourpost+decompteIj2.prolongation.nbprolongation}}
+                                    Jour(s)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6"></div>
+                                <div class="col-sm-6"><strong>-</strong></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">Droit 1ère tranche :</div>
+                                <div class="col-sm-6 text-right"> {{decompteIj2.redressement.newDroit1tranche|
+                                    number:'1.2-2':'fr'}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">Droit 2ème tranche :</div>
+                                <div class="col-sm-6 text-right"> {{decompteIj2.redressement.newDroit2tranche|
+                                    number:'1.2-2':'fr'}}
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-6"></div>
+                                <div class="col-sm-6 text-right tout">
+                                    {{decompteIj2.redressement.droitTotal| number:'1.2-2':'fr'}} </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-sm-6">Déjà payé 1ère tranche</div>
+                                <div class="col-sm-6 text-right tout">
+                                    {{decompteIj2.redressement.dejaPaye| number:'1.2-2':'fr'}} </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6"></div>
+                        <div class="col-sm-6 marge">
+                            <div class="row">
+                                <div class="col-sm-6">Reste à payer :</div>
+                                <div class="col-sm-6 text-right">
+                                    {{decompteIj2.redressement.restePaye| number:'1.2-2':'fr'}}
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-sm-6">Net à payer : </div>
+                                <div class="col-sm-6 text-right tout">
+                                    <strong>{{decompteIj2.redressement.restePaye| number:'1.2-2':'fr'}}
+                                        Ar
+                                    </strong>
+                                </div>
+                            </div>
+                            <hr>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-10"></div>
+
+                        <div class="col-sm-2"><input type="button" (click)="imprimerPDF()" value="Imprimer"
+                                class="btn btn-block btn4" /><br>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+            </div>
+            <br>
+        </div>
+    </div>
+</div>
+<!-- SANS REDRESSEMENT -->
+<div class="container" id="printableArea3" *ngIf="enPDF && !estRedressement"
+    style="width: 100%;font-family: 'Century Gothic',CenturyGothic,AppleGothic,sans-serif !important;">
+    <div style="display: flex;flex-wrap: wrap;height: 200px;">
+        <div style="-webkit-box-flex: 0;flex: 0 0 20%;max-width: 20%;position: relative;width: 100%;"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8"></div>
+                <div class="col-sm-4 text-center">Date : {{dateNow | date:'d MMMM y':'':'fr'}}</div>
+                <div class="col-sm-12"><br>
+                    DECOMPTE DROIT INDEMNITE JOURNALIERE DEUXIEME TRANCHE
+                    <br>
+                </div>
+                <div class="col-sm-12"><br><br></div>
+                <div class="col-sm-12 bas">
+                    <p class="texte-indiv" *ngIf="individu">Mme {{individu.nom}} {{individu.prenoms}}</p>
+                    <p class="texte-indiv" *ngIf="employeur">{{employeur.employeur_nom}}</p>
+                    <p class="texte-indiv" *ngIf="adresseIndividu">{{adresseIndividu.quartier}}
+                        {{adresseIndividu.complement}}
+                    </p>
+                    <p class="texte-indiv" *ngIf="adresseIndividu">
+                        {{adresseIndividu.fokontany.firaisana.fivondronana.region.faritany.libelle}}</p>
+                </div>
+                <hr>
+                <div class="col-sm-6" *ngIf="employeur">Employeur : {{employeur.employeur_matricule}}</div>
+                <div class="col-sm-6">Réf demande : {{idDmdIJ}} </div>
+                <div class="col-sm-12" *ngIf="individu">N° CNaPS : {{individu.id_individu}}</div>
+                <div class="col-sm-12"><br></div>
+                <div class="col-sm-12">
+                    <p>Décompte de droits de MME</p>
+                    <p *ngIf="individu">{{individu.nom}} {{individu.prenoms}}</p>
+                </div>
+                <div class="col-sm-12">
+                    <h5 class="titre1"><strong>1 - PERIODE PRENATALE</strong> </h5>
+                    <p>Date d'accouchement : {{decompteIj2.dac | date : 'dd/MM/yyyy'}}</p>
+                    <p>Arrêt de travail : {{decompteIj2.dat | date : 'dd/MM/yyyy'}}</p>
+                    <p>Montant du salaire (Ar) : {{decompteIj2.salaire | number:'1.2-2':'fr'}}</p>
+                    <p>Indemnité journalière (Ar) : {{decompteIj2.postnatale| number:'1.2-2':'fr'}}
+                    </p>
+                    <p>Du {{decompteIj2.date_debut_prenatale | date : 'dd/MM/yyyy'}} Au
+                        {{decompteIj2.dac | date : 'dd/MM/yyyy'}}
+                        Soit {{decompteIj2.nbjourpre}}
+                        Jour(s) X {{decompteIj2.demiSalaire | number:'1.2-2':'fr'}} =
+                        {{decompteIj2.prenatale | number:'1.2-2':'fr'}} Ar.</p>
+                    <h5 class="titre1"><strong> 2- PERIODE POST NATALE</strong> </h5>
+                    <p>Reprise de travail : {{decompteIj2.drt | date : 'dd/MM/yyyy'}}</p>
+                    <p>Du {{decompteIj2.date_debut_postnatale | date : 'dd/MM/yyyy'}} Au
+                        {{decompteIj2.date_fin_postnatale | date : 'dd/MM/yyyy'}}
+                        Soit {{decompteIj2.nbjourpost}} Jour(s) X {{decompteIj2.demiSalaire | number:'1.2-2':'fr'}} =
+                        {{decompteIj2.postnatale | number:'1.2-2':'fr'}} Ar.
+                    </p>
+                </div>
+                <div class="col-sm-12">
+                    <h5 class="titre1"><strong> 3- PROLONGATION</strong> </h5>
+                    <p>Du {{decompteIj2.prolongation.date_debut_prolongation | date : 'dd/MM/yyyy'}} au
+                        {{decompteIj2.prolongation.date_fin_prolongation | date : 'dd/MM/yyyy'}}
+                        = {{decompteIj2.prolongation.nbprolongation}} Jour(s)</p>
+                    <hr>
+                </div>
+                <div class="col-sm-6"></div>
+                <div class="col-sm-6 marge">
+                    <div class="row">
+                        <div class="col-sm-6">Total :</div>
+                        <div class="col-sm-6 text-right">
+                            {{decompteIj2.nbjourpre+decompteIj2.nbjourpost+decompteIj2.prolongation.nbprolongation}}
+                            Jour(s)
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6"></div>
+                        <div class="col-sm-6"><strong>-</strong></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">Déja payé :</div>
+                        <div class="col-sm-6 text-right"> {{decompteIj2.nbjourIJ1}} jour(s) </div>
+                    </div>
+                    <hr>
+                </div>
+                <div class="col-sm-6"></div>
+                <div class="col-sm-6 marge">
+                    <div class="row">
+                        <div class="col-sm-6">Reste à payer :</div>
+                        <div class="col-sm-6 text-right">
+                            {{decompteIj2.nbjourpre+decompteIj2.nbjourpost+decompteIj2.prolongation.nbprolongation-decompteIj2.nbjourIJ1}}
+                            jour(s)
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6"></div>
+                        <div class="col-sm-6"><strong>x</strong></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6"></div>
+                        <!-- <div class="col-sm-6 text-right">{{decompteIj2.demiSalaire}} Ar</div> -->
+                        <div class="col-sm-6 text-right">
+                            {{decompteIj2.postnatale | number:'1.2-2':'fr'}} Ar</div>
+                    </div>
+                    <hr>
+                </div>
+                <div class="col-sm-6"></div>
+                <div class="col-sm-6 marge">
+                    <!-- <p class="text-right">
+              {{(decompteIj2.nbjourpre+decompteIj2.nbjourpost-decompteIj2.nbjourIJ1)*decompteIj2.demiSalaire}}
+            </p> -->
+                    <p class="text-right">
+                        {{decompteIj2.montantDroit | number:'1.2-2':'fr'}}
+                    </p>
+                </div>
+                <div class="col-sm-6"></div>
+                <div class="col-sm-6 marge">
+                    <div class="row">
+                        <div class="col-sm-6">Net à payer : </div>
+                        <div class="col-sm-6 text-right tout">
+                            <!--   <strong>{{(decompteIj2.nbjourpre+decompteIj2.nbjourpost+decompteIj2.prolongation.nbprolongation-decompteIj2.nbjourIJ1)*decompteIj2.demiSalaire}}
+                  Ar
+                </strong> -->
+                            <strong>{{decompteIj2.montantDroit | number:'1.2-2':'fr'}}
+                                Ar
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br><br>
+        </div>
+    </div>
+</div>
+
+<!-- AVEC REDRESSEMENT -->
+<div class="container" id="printableArea3" *ngIf="enPDF && estRedressement"
+    style="width: 100%;font-family: 'Century Gothic',CenturyGothic,AppleGothic,sans-serif !important;">
+    <div style="display: flex;flex-wrap: wrap;height: 200px;">
+        <div style="-webkit-box-flex: 0;flex: 0 0 20%;max-width: 20%;position: relative;width: 100%;"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8"></div>
+                <div class="col-sm-4 text-center">Date : {{dateNow | date:'d MMMM y':'':'fr'}}</div>
+                <div class="col-sm-12"><br>
+                    DECOMPTE DROIT INDEMNITE JOURNALIERE DEUXIEME TRANCHE
+                    <br>
+                </div>
+                <div class="col-sm-12"><br><br></div>
+                <div class="col-sm-12 bas">
+                    <p class="texte-indiv" *ngIf="individu">Mme {{individu.nom}} {{individu.prenoms}}</p>
+                    <p class="texte-indiv" *ngIf="employeur">{{employeur.employeur_nom}}</p>
+                    <p class="texte-indiv" *ngIf="adresseIndividu">{{adresseIndividu.quartier}}
+                        {{adresseIndividu.complement}}
+                    </p>
+                    <p class="texte-indiv" *ngIf="adresseIndividu">
+                        {{adresseIndividu.fokontany.firaisana.fivondronana.region.faritany.libelle}}</p>
+                </div>
+                <hr>
+                <div class="col-sm-6" *ngIf="employeur">Employeur : {{employeur.employeur_matricule}}</div>
+                <div class="col-sm-6">Réf demande : {{idDmdIJ}} </div>
+                <div class="col-sm-12" *ngIf="individu">N° CNaPS : {{individu.id_individu}}</div>
+                <div class="col-sm-12"><br></div>
+                <div class="col-sm-12">
+                    <p>Décompte de droits de MME</p>
+                    <p *ngIf="individu">{{individu.nom}} {{individu.prenoms}}</p>
+                </div>
+                <div class="col-sm-12">
+                    <h5 class="titre1"><strong>1 - PERIODE PRENATALE</strong> </h5>
+                    <p>Date d'accouchement : {{decompteIj2.dac | date : 'dd/MM/yyyy'}}</p>
+                    <p>Arrêt de travail : {{decompteIj2.dat | date : 'dd/MM/yyyy'}}</p>
+                    <p>Montant du salaire (Ar) : {{montantSalaire | number:'1.2-2':'fr'}}</p>
+                    <p>Indemnité journalière (Ar) :
+                        {{decompteIj2.redressement.dejaPaye | number:'1.2-2':'fr'}}</p>
+                    <p>Du {{decompteIj2.date_debut_prenatale | date : 'dd/MM/yyyy'}} Au
+                        {{decompteIj2.dac | date : 'dd/MM/yyyy'}}
+                        Soit {{decompteIj2.nbjourpre}}
+                        Jour(s) X {{decompteIj2.demiSalaire | number:'1.2-2':'fr'}} =
+                        {{decompteIj2.prenatale | number:'1.2-2':'fr'}} Ar.</p>
+                    <h5 class="titre1"><strong> 2- PERIODE POST NATALE</strong> </h5>
+                    <p>Reprise de travail : {{decompteIj2.drt | date : 'dd/MM/yyyy'}}</p>
+                    <p>Du {{decompteIj2.date_debut_postnatale | date : 'dd/MM/yyyy'}} Au
+                        {{decompteIj2.date_fin_postnatale | date : 'dd/MM/yyyy'}}
+                        Soit {{decompteIj2.nbjourpost}} Jour(s) X {{decompteIj2.demiSalaire | number:'1.2-2':'fr'}} =
+                        {{decompteIj2.postnatale | number:'1.2-2':'fr'}} Ar.
+                    </p>
+                </div>
+                <div class="col-sm-12">
+                    <h5 class="titre1"><strong> 3- PROLONGATION</strong> </h5>
+                    <p>Du {{decompteIj2.prolongation.date_debut_prolongation | date : 'dd/MM/yyyy'}} au
+                        {{decompteIj2.prolongation.date_fin_prolongation | date : 'dd/MM/yyyy'}}
+                        = {{decompteIj2.prolongation.nbprolongation}} Jour(s)</p>
+                    <hr>
+                </div>
+                <div class="col-sm-6"></div>
+                <div class="col-sm-6 marge">
+                    <div class="row">
+                        <div class="col-sm-6">Total :</div>
+                        <div class="col-sm-6 text-right">
+                            {{decompteIj2.nbjourpre+decompteIj2.nbjourpost+decompteIj2.prolongation.nbprolongation}}
+                            Jour(s)
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6"></div>
+                        <div class="col-sm-6"><strong>-</strong></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">Droit 1ère tranche :</div>
+                        <div class="col-sm-6 text-right"> {{decompteIj2.redressement.newDroit1tranche|
+                            number:'1.2-2':'fr'}} </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">Droit 2ème tranche :</div>
+                        <div class="col-sm-6 text-right"> {{decompteIj2.redressement.newDroit2tranche|
+                            number:'1.2-2':'fr'}} </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-6"></div>
+                        <div class="col-sm-6 text-right tout"> {{decompteIj2.redressement.droitTotal|
+                            number:'1.2-2':'fr'}} </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">Déjà payé 1ère tranche</div>
+                        <div class="col-sm-6 text-right tout"> {{decompteIj2.redressement.dejaPaye|
+                            number:'1.2-2':'fr'}} </div>
+                    </div>
+                </div>
+                <div class="col-sm-6"></div>
+                <div class="col-sm-6 marge">
+                    <div class="row">
+                        <div class="col-sm-6">Reste à payer :</div>
+                        <div class="col-sm-6 text-right">
+                            {{decompteIj2.redressement.restePaye| number:'1.2-2':'fr'}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">Net à payer : </div>
+                        <div class="col-sm-6 text-right tout">
+                            <strong>{{decompteIj2.redressement.restePaye| number:'1.2-2':'fr'}}
+                                Ar
+                            </strong>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+            <br><br>
+        </div>
+    </div>
+</div>
+
+<!-- VALIDATION SEM -->
+<div class="modal fade" id="validSem" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div style="max-width: 800px!important;" class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Changer état</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="panel">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label>Etat</label>
+                            <select (change)="onChangeEtat($event.target)" class="form-control custom-select">
+                                <option *ngFor="let etat of listeAutreEtat" value="{{etat.id_type_etat}}">
+                                    {{etat.libelle}}</option>
+                            </select>
+                        </div>
+                        <br>
+                        <fieldset class="col-md-12">
+                            <legend>Observation médicale</legend>
+                            <div class="panel">
+                                <div class="panel-body">
+                                    <div class="row interligne">
+                                        <div class="col-md-3">
+                                            <label class="control-label texte-content" for="typeArret">Observation
+                                                médicale:</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <textarea name="observations" [(ngModel)]="EtatDmd.observationsSem"
+                                                class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </fieldset>
+
+                        <div class="clearfix"></div>
+                    </div>
+                    <br>
+                </div>
+                <br>
+                <div class="panel">
+                    <div class="panel-body">
+                        <fieldset class="col-md-12">
+                            <legend>Avis technique</legend>
+                            <div class="panel">
+                                <div class="panel-body">
+                                    <div class="row interligne">
+                                        <div class="col-md-3">
+                                            <label class="control-label texte-content" for="typeArret">Avis
+                                                technique:</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <textarea name="observations" [(ngModel)]="EtatDmd.observations"
+                                                class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="clearfix"></div>
+                    </div>
+                    <br>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-sm-5">
+                        <div *ngIf="!show">
+                            <button *ngIf="cant_validate==true" (click)="validerSEM()" type="submit"
+                                class="btn btn-success">Valider</button>
+                        </div>
+                        <div *ngIf="show">
+                            <div class="loader"></div>
+                        </div>
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

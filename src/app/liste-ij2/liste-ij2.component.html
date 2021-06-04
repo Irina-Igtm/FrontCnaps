@@ -33,7 +33,7 @@
               </div>
             <div class="col-md-4 form-group">
               <mat-form-field class="example-full-width">
-                <input matInput type="text" class="form-control" [(ngModel)]="filtre.reference"
+                <input matInput type="text" class="form-control" [(ngModel)]="filtre.id_acc"
                   (keyup.enter)="filtreChange('surRef')" style="width: 100%;" placeholder="Recherche par référence">
               </mat-form-field>
             </div>
@@ -61,9 +61,9 @@
             <div class="col-md-2 form-group"></div>
 
           </div>
-          <div class="row">
-            <div *ngIf="!show" style="width: 100%">
-              <table class="table table-striped">
+          <div class="card-body">
+            <div *ngIf="!show" class="table-responsive">
+              <table class="table table-hover">
                 <thead>
                   <tr>
                     <td>Date de réception</td>
@@ -79,7 +79,8 @@
                     <td>{{dmd.date_dossier | date:'dd/MM/yyyy'}}</td>
                     <td>{{dmd.id_acc}}</td>
                     <td>{{dmd.id_individu}}</td>
-                    <td>{{dmd.nom}} {{dmd.prenoms}}</td>
+                    <td>{{dmd.nom}} </td>
+                    <td>{{dmd.prenoms}}</td>
                     <td>{{dmd.libelle_etat}}</td>
                     <td>
                       <button (click)="onClickIJDetails(dmd.id_acc)" class="btn btn1 btn-block">Voir détails</button>
@@ -87,11 +88,11 @@
                   </tr>
                 </tbody>
               </table>
-              <nav aria-label="Page navigation example">
+              <!-- <nav aria-label="Page navigation example">
                 <ngb-pagination class="d-flex justify-content-center" [pageSize]="max" [collectionSize]="max * nbPage"
                   [(page)]="page" aria-label="asdf" [boundaryLinks]="true" [rotate]="true" [maxSize]="10"
                   (pageChange)="changeValue($event)"></ngb-pagination>
-              </nav>
+              </nav> -->
             </div>
             <div *ngIf="show" style="margin: auto">
               <div class="loader" style="margin: auto"></div>

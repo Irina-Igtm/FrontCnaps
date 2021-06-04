@@ -10,7 +10,8 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./liste-ij2.component.css']
 })
 export class ListeIJ2Component implements OnInit {
-
+  accessToken:any;
+  idToken:any;
   show: boolean = false;
   listDmdIj: any[];
   listEtatDmdIj: any[];
@@ -39,7 +40,7 @@ export class ListeIJ2Component implements OnInit {
 
   filtre = {
     matricule: "",
-    reference: "",
+    id_acc: "",
     prestation: "422",
     type_etat: 1,
     dateReception: "",
@@ -48,8 +49,6 @@ export class ListeIJ2Component implements OnInit {
     pagination: 1,
     taille: 20
   }
-
-  id_token: any;
   constructor(
     private trtsrvc: TraitementService,
     private toastr: ToastrService,
@@ -58,10 +57,10 @@ export class ListeIJ2Component implements OnInit {
 
   ngOnInit(): void {
     document.title = "LISTE - IJ2";
-    this.user = JSON.parse(localStorage.getItem('user'));
-    console.log("USER", this.user);
-
-    this.id_token = localStorage.getItem('id_token');
+    this.accessToken = localStorage.getItem('user');
+    this.idToken = JSON.parse(this.accessToken).accessToken;
+    console.log("TOKEN" , this.idToken);
+    
     this.pagination = 1;
     this.prendListe();
   }
@@ -70,27 +69,17 @@ export class ListeIJ2Component implements OnInit {
       this.filtre.pagination = this.page,
       this.filtre.type_etat = this.etat,
       this.filtre.dateReception = this.filtre.dateReception,
-      this.filtre.reference = this.filtre.reference,
+      this.filtre.id_acc = this.filtre.id_acc,
       this.filtre.matricule = this.filtre.matricule,
       this.filtre.nom = this.filtre.nom,
       this.filtre.prenom = this.filtre.prenom
-
+      
     this.prendListe();
   }
 
   prendListe() {
     this.show = true;
-    const obj = {
-      type_etat: this.etat,
-      prestation: this.code_prestation,
-      pagination: this.page,
-      matricule: this.searchByMatricule,
-      reference: this.searchByRef,
-      dateReception: this.searchByDateReception,
-      taille: this.max
-    };
-
-    this.trtsrvc.prendListeDemandePF(this.filtre).subscribe(data => {
+    this.trtsrvc.prendListeDemandePF(this.filtre, this.idToken).subscribe(data => {
       if (data.status == 200) {
         this.listDmdIj = data.body['list'];
         this.nbPage = data.body['totalPages'];
@@ -111,7 +100,7 @@ export class ListeIJ2Component implements OnInit {
 
   getEtatDemande() {
     if (this.listEtatDmdIj == undefined) {
-      this.trtsrvc.listeRefEtatTypWS(this.id_token).subscribe(dataWS => {
+      this.trtsrvc.listeRefEtatTypWS(this.idToken).subscribe(dataWS => {
 
         let liste: any = dataWS.body;
         liste.sort((a, b) => {
@@ -126,7 +115,7 @@ export class ListeIJ2Component implements OnInit {
 
   filtreChange(sur) {
     if (sur == 'surRef') {
-      if (this.filtre.reference.length >= 12 || this.filtre.reference.length == 0) {
+      if (this.filtre.id_acc.length >= 12 || this.filtre.id_acc.length == 0) {
         this.page = 1;
         this.changeCritere();
 
@@ -154,6 +143,11 @@ export class ListeIJ2Component implements OnInit {
         this.changeCritere();
       }
     }
+  }
+
+  onChange(event) {
+    this.etat = event.target.value;
+    this.changeCritere();
   }
 
 }

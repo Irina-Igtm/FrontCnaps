@@ -40,7 +40,9 @@ import { ToastrModule } from 'ngx-toastr';
 import { NgxSelectModule } from 'ngx-select-ex';
 import { ListeIJ2Component } from './liste-ij2/liste-ij2.component';
 import { AccuseReceptionComponent } from './accuse-reception/accuse-reception.component';
-import { DemandeNonRecevableComponentComponent } from './demande-non-recevable-component/demande-non-recevable-component.component';
+import { OpIj2Component } from './op-ij2/op-ij2.component';
+import { DetailsIj2Component } from './details-ij2/details-ij2.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 enableProdMode();
 
 @NgModule({
@@ -65,7 +67,8 @@ enableProdMode();
     MatTooltipModule,
     NgxCollapseModule,
     ToastrModule.forRoot(),
-    NgxSelectModule
+    NgxSelectModule,
+    NgbModule
   ],
   declarations: [
     AppComponent,
@@ -73,8 +76,8 @@ enableProdMode();
     LoginComponent,
     ListeIJ2Component,
     AccuseReceptionComponent,
-    DemandeNonRecevableComponentComponent
-
+    OpIj2Component,
+    DetailsIj2Component,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },

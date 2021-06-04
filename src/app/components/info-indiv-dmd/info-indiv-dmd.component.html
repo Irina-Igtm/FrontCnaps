@@ -1,0 +1,41 @@
+<div *ngIf="Individu" class="row">
+  <div class="col-6 form-group">
+    <label class="control-label texte-content">Nom</label>
+    <label class="form-control">{{Individu.nom}}</label>
+  </div>
+  <div class="col-6 form-group">
+    <label class="control-label texte-content">Prénom</label>
+    <label class="form-control">{{Individu.prenoms}}</label>
+  </div>
+  <div class="col-6">
+    <label class="control-label texte-content">Matricule</label>
+    <label class="form-control">{{Individu.id_individu}}</label>
+  </div>
+  <div *ngIf="Individu.id_sexe" class="col-6">
+    <label class="control-label texte-content">Sexe</label>
+    <label class="form-control">{{Individu.id_sexe.libelle}}</label>
+  </div>
+  <div class="col-6">
+    <label class="control-label texte-content">Date de naissance</label>
+    <label class="form-control">{{Individu.date_naissance | date:'dd/MM/yyyy'}}</label>
+  </div>
+  <div class="col-6">
+    <label class="control-label texte-content">Lieu de naissance:</label>
+    <label class="form-control">{{Individu.lieu_naissance}}</label>
+  </div>
+  <div class="col-6">
+    <label class="control-label texte-content">CIN</label>
+    <label class="form-control">{{Individu.cin}}</label>
+  </div>
+  <div class="col-6 form-group">
+    <label class="control-label texte-content">Date CIN</label>
+    <label class="form-control">{{Individu.date_cin | date:'dd/MM/yyyy'}}</label>
+  </div>
+  <div *ngIf="Individu.id_nationalite" class="col-6 form-group">
+    <label class="control-label texte-content">Nationalité</label>
+    <label class="form-control">{{Individu.id_nationalite.libelle}}</label>
+  </div>
+  <div class="col-12" style="text-align: right;">
+    <button (click)="voirCIT()" class="btn btn-success">Voir CIT</button>
+  </div>
+</div>

@@ -188,11 +188,12 @@
       <div class="col-md-8">
         <div class="card">
           <div class="card-header card-header-info">
-            <h4 class="card-title" style="text-align: center;">Informations famille(s)</h4>
+            <h4 class="card-title" style="text-align: center;" [collapse]="content1"><button
+                class="btn btn-info btn-block"> Info famille</button></h4>
           </div>
           <div class="card-body">
             <form>
-              <div class="table-responsive">
+              <div collapseContent #content1="collapseContent">
                 <table class="table table-hover table-sm">
                   <thead>
                     <th>Matricule</th>
@@ -212,6 +213,26 @@
                   </tbody>
                 </table>
               </div>
+              <!-- <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                  <thead>
+                    <th>Matricule</th>
+                    <th>Statut</th>
+                    <th>Nom</th>
+                    <th>Prenom</th>
+                    <th>Date de naissance</th>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of famille">
+                      <td>{{item.matricule}}</td>
+                      <td>{{item.statut}}</td>
+                      <td>{{item.nom}}</td>
+                      <td>{{item.prenom}}</td>
+                      <td>{{item.datenaissance}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div> -->
             </form>
           </div>
         </div>
@@ -549,14 +570,14 @@
               <ngx-select placeholder="Type" [items]="modeP" [(ngModel)]="mp.type_mdp"></ngx-select>
             </div>
           </div>
-          <div class="col-10 form-group" *ngIf = "mp.type_mdp == 'mobile'">
+          <div class="col-10 form-group" *ngIf="mp.type_mdp == 'mobile'">
             <div class="col-md-4">
               <mat-form-field class="example-full-width">
                 <input matInput placeholder="Numero telephone" type="text" [(ngModel)]="mp.numero" required>
               </mat-form-field>
             </div>
           </div>
-          <div class="col-12 form-group" *ngIf = "mp.type_mdp == 'virement'">
+          <div class="col-12 form-group" *ngIf="mp.type_mdp == 'virement'">
             <div class="col-md-4">
               <mat-form-field class="example-full-width">
                 <input matInput placeholder="Banque" type="text" [(ngModel)]="mp.banque" required>

@@ -189,14 +189,13 @@ export class TraitementService {
     return this.http.post(this.notif + 'ajoutnotif',data, { headers: headers, observe: 'response' });
   }
 
-  prendListeDemandePF(filtre) {
-    const headers = new HttpHeaders();
+  prendListeDemandePF(filtre ,  token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     return this.http.post<any>(this.demande + 'prendListeDemandePF', filtre, { headers: headers, observe: 'response' });
   }
 
   listeRefEtatTypWS(token: string) {
-    const headers = new HttpHeaders();
-    headers.set('Authorization', 'Bearer ' + token);
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     return this.http.post(this.demande + 'listeRefEtatTypPF', null, { headers: headers, observe: 'response' });
   }
 

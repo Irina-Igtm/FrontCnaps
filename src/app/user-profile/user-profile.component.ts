@@ -129,7 +129,7 @@ export class UserProfileComponent implements OnInit {
   }
   typeMp = [{ nom: "virement" }, { nom: "espece" }, { nom: "mobile" }];
   modeP: any[] = []
-
+  refAcc: any;
   constructor(
     private traitSvc: TraitementService,
     private routes: Router,
@@ -405,7 +405,7 @@ export class UserProfileComponent implements OnInit {
 
   ValideSaveDemande() {
     let MPDemande = {}
-    if (this.modePaie != null && this.checkEmpl != null) {
+    if (this.modePaie != null || this.checkEmpl != null) {
       this.insererDemande()
       MPDemande = {
         modepaiement: this.modePaie.type_mdp,
@@ -414,10 +414,9 @@ export class UserProfileComponent implements OnInit {
         numero_cmpt: this.modePaie.numero_cmpt
       }
       localStorage.setItem("modepaie", JSON.stringify(MPDemande))
-
     }
     else {
-      this.toastr.warning('info', 'Veuillez choisir un mode de paiement et employeur')
+      this.saveNoteRetour();
     }
   }
 
@@ -443,10 +442,11 @@ export class UserProfileComponent implements OnInit {
       tecInfoRecuMod: [],
       tecPcsRecMod: [],
     };
-    this.saveAccuse();
+    
     this.traitSvc.saveDemande(msg, this.idToken).subscribe(res => {
       let dataSave = this.traitSvc.transformeWSReponse(res);
       if (dataSave.success) {
+        this.saveAccuse();
         localStorage.setItem("stock", JSON.stringify(msg));
         localStorage.getItem('user');
         localStorage.setItem("typeDemande", "Demande Indeminité Journalière deuxième tranche");
@@ -517,10 +517,34 @@ export class UserProfileComponent implements OnInit {
     };
     this.ij2srvc.ajoutAccuseWS(accuseMsg, this.idToken).subscribe(data => {
       if (data.status == 200) {
-        console.log("DATA ACCUSE", data);
         this.toastr.success("Ajout des messages réussie")
       }
     });
+  }
+
+  saveNoteRetour() {
+    let accuseMsg = {}
+    accuseMsg = {
+      matricule: this.indiv,
+      nom: this.individu.nom,
+      prenom: this.individu.prenoms,
+      typeDemande: null,
+      agentAccueil: JSON.parse(this.accessToken).username,
+      observation: "Demande indemnité journalière 2 ème tranche vers le note de retour",
+      page: 1,
+      size: null,
+      listePiece: ["Pièces justificatives"]
+    };
+    this.ij2srvc.ajoutAccuseWS(accuseMsg, this.idToken).subscribe(data => {
+      if (data.status == 200) {
+        this.toastr.success("Ajout des messages réussie")
+        this.versNoteRetour(data.body.reference)
+      }
+    });
+  }
+
+  versNoteRetour(reference){
+    this.routes.navigate(['/accusereception/'+reference])
   }
 
 }

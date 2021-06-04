@@ -12,5 +12,6 @@ export const environment = {
   employeur: 'http://localhost:7888/',
   accuse:'http://localhost:5459/',
   reglementOp:'http://localhost:8529/',
+  banque:'http://localhost:9501/',
 };
 

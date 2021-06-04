@@ -1,0 +1,39 @@
+<div *ngIf="!pourInfo" class="col-sm-12" [formGroup]="form">
+  <div class="row">
+    <div class="col-sm-4 texte-content" [attr.for]="input.key">
+      {{input.label}} : 
+    </div>
+    <div class="col-sm-8">
+      <ng-container *ngIf="!input.readonly && !estArgent">
+          <input class="form-control" [formControlName]="input.key" [id]="input.key" [type]="input.type" [value]="input.value" (keyup)="clavier()" >
+      </ng-container>
+      <ng-container *ngIf="!input.readonly && estArgent">
+          <input class="form-control" [formControlName]="input.key" [id]="input.key" type="text" [value]="input.value" (keyup)="clavier()" >
+      </ng-container>
+      <ng-container *ngIf="input.readonly">
+          <input class="form-control" [formControlName]="input.key" [id]="input.key" [type]="input.type" [value]="input.value" readonly >
+      </ng-container>
+      <span class="errorMessage" *ngIf="!isValid">{{input.label}} is required</span>
+    </div>
+  </div>
+  <br>
+</div>
+<div *ngIf="pourInfo" class="col-sm-12">
+  <div class="row">
+    <div class="col-sm-4 texte-content">
+      {{input.label}} : 
+    </div>
+    <div class="col-sm-8">
+      <ng-container *ngIf="!input.readonly && !estArgent">
+          <input class="form-control" [type]="input.type" [value]="input.value">
+      </ng-container>
+      <ng-container *ngIf="!input.readonly && estArgent">
+          <input class="form-control" type="text" [value]="input.value">
+      </ng-container>
+      <ng-container *ngIf="input.readonly">
+          <input class="form-control" [type]="input.type" [value]="input.value" readonly>
+      </ng-container>
+    </div>
+  </div>
+  <br>
+</div>
