@@ -1,3 +1,4 @@
+import { DetailsIj2Component } from './../../details-ij2/details-ij2.component';
 import { AccuseReceptionComponent } from './../../accuse-reception/accuse-reception.component';
 import { AuthGuard } from './../../helper/auth.guard';
 import { Routes } from '@angular/router';
@@ -11,7 +12,6 @@ import { MapsComponent } from '../../maps/maps.component';
 import { NotificationsComponent } from '../../notifications/notifications.component';
 import { UpgradeComponent } from '../../upgrade/upgrade.component';
 import { ListeIJ2Component } from '../../liste-ij2/liste-ij2.component';
-import { DemandeNonRecevableComponent } from '../../demande-non-recevable/demande-non-recevable.component';
 import { Role } from '../../models/role'
 
 export const AdminLayoutRoutes: Routes = [
@@ -68,6 +68,6 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'upgrade', component: UpgradeComponent, canActivate: [AuthGuard], data: { roles: [Role.bo, Role.admin, Role.user] } },
     { path: 'accusereception/:reference', component: AccuseReceptionComponent, canActivate: [AuthGuard] },
     { path: 'listeij2', component: ListeIJ2Component, canActivate: [AuthGuard], data: { roles: [Role.bo, Role.admin, Role.user] } },
-    { path: 'demande/non/recevable/:reference', component: DemandeNonRecevableComponent, canActivate: [AuthGuard] },
+    { path: 'details-ij2/:id', component: DetailsIj2Component, canActivate: [AuthGuard] },
 
 ];

@@ -1,8 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { IjPfService } from '../../../services/ij-pf/ij-pf.service';
-import { BanqueService } from '../../../services/banque/banque.service';
-import { UiService } from '../../../services/ui/ui.service';
+import { Ij2ServiceService } from '../../services/ij2-service.service';
+import { TraitementService } from '../../services/traitement/traitement.service';
+
+
 
 @Component({
 	selector: 'app-change-mode-paiement',
@@ -27,26 +28,28 @@ export class ChangeModePaiementComponent implements OnInit {
 	listeMP = [];
 
 	idToken;
+	accessToken:any
 
 	constructor(
 		private toast: ToastrService,
-		private banqueService: BanqueService,
-		private ijPfService: IjPfService,
-		private uiService: UiService) { }
+		private ij2srvc : Ij2ServiceService,
+		private traitSrvc: TraitementService
+		) { }
 
 	ngOnInit() {
-		this.idToken = localStorage.getItem('id_token');
+		this.accessToken = localStorage.getItem('user');
+		this.idToken = JSON.parse(this.accessToken).accessToken;
 		if (this.idAcc == null || this.idIndividu == null || this.idAcc == undefined || this.idIndividu == undefined) {
 			this.toast.info("Certaines valeurs pour les détails du mode de paiement sont invalides");
 		}
 		else {
 			let that = this;
 			// prend la liste des modes de paiement
-			this.banqueService.getAllmodepaiementWS(this.idToken).subscribe(obsLMP => {
+			this.ij2srvc.getAllmodepaiementWS(this.idToken).subscribe(obsLMP => {
 				console.log("getAllmodepaiement", obsLMP);
 				if (obsLMP.status == 200) {
 					that.listeModePaiement = obsLMP.body;
-					this.ijPfService.getmodepaiebyidaccWS(this.idAcc, this.idToken).subscribe(obs => {
+					this.traitSrvc.listeMP(this.idIndividu, this.idToken).subscribe(obs => {
 						console.log("getmodepaiebyidacc", obs);
 						if (obs.status == 200 && obs.body != null) {
 							that.mpActuel.mp = obs.body;
@@ -54,7 +57,7 @@ export class ChangeModePaiementComponent implements OnInit {
 								if (mp.id_mode_paiement == that.mpActuel.mp.idModePaiement) {
 									that.mpActuel.typeLibelle = mp.libelle;
 									that.mpActuel.typeAbrev = mp.abreviation;
-									that.mpActuel.lieuAgence = that.mpActuel.mp.libelleAgence;
+									// that.mpActuel.lieuAgence = that.mpActuel.mp.libelleAgence;
 									break;
 								}
 							}
@@ -69,7 +72,7 @@ export class ChangeModePaiementComponent implements OnInit {
 
 	prendListeMP() {
 		let that = this;
-		this.banqueService.listeMPbymatriculeWS(this.idIndividu, this.idToken).subscribe(obs => {
+		this.ij2srvc.listeMPbymatriculeWS(this.idIndividu, this.idToken).subscribe(obs => {
 			console.log("listeMPbymatricule => " + that.idIndividu, obs);
 			if (obs.status == 200) {
 				let liste = [];
@@ -101,14 +104,14 @@ export class ChangeModePaiementComponent implements OnInit {
 		let modePaiement = null;
 		for (let mp of this.listeMP) {
 			if (mp.estCoche) {
-				modePaiement = this.uiService.creerModePaiementOP(this.idAcc, mp.mp);
+				modePaiement = this.ij2srvc.creerModePaiementOP(this.idAcc, mp.mp);
 				break;
 			}
 		}
 		console.log("validerChoixMp modePaiement", modePaiement);
 		if (modePaiement != null) {
 			if (this.aucunTrouve) {
-				this.ijPfService.ajouttrsmodepaieWS(modePaiement, this.idToken).subscribe(obs => {
+				this.traitSrvc.saveModepaie(modePaiement, this.idToken).subscribe(obs => {
 					console.log("ajouttrsmodepaieWS", obs);
 					if (obs.status == 200) {
 						this.traitement(modePaiement);
@@ -120,7 +123,7 @@ export class ChangeModePaiementComponent implements OnInit {
 				});
 			}
 			else {
-				this.ijPfService.updatemodepaiementop(modePaiement).subscribe(obs => {
+				this.ij2srvc.updatemodepaiementop(modePaiement).subscribe(obs => {
 					console.log("updatemodepaiementop", obs);
 					if (obs.status == 200) {
 						this.traitement(modePaiement);

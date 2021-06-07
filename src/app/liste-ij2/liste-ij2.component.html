@@ -12,7 +12,7 @@
               <label class="col-sm-6 col-form-label texte-content">Etat</label>
               <div class="col-sm-6">
                 <select (change)="onChange($event)" [(ngModel)]="etat" name="etat" class="form-control">
-                  <option value="0"></option>
+                  <option value=""></option>
                   <option *ngFor="let a of listEtatDmdIj; let i = index;" value="{{a.id_type_etat}}">{{a.libelle}}
                   </option>
                 </select>

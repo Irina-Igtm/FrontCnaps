@@ -17,7 +17,9 @@ export class Ij2ServiceService {
   individu: any;
   employeur: any;
   accuse: any;
-  rglOp: any
+  rglOp: any;
+  banque:any
+  dn: any;
   constructor(
     private http: HttpClient
   ) {
@@ -28,6 +30,9 @@ export class Ij2ServiceService {
     this.employeur = environment.employeur;
     this.accuse = environment.accuse;
     this.rglOp = environment.reglementOp
+    this.banque = environment.banque
+    this.dn = environment.dn
+
   }
 
   ajoutAccuseWS(msg, token: string) {
@@ -43,7 +48,7 @@ export class Ij2ServiceService {
   infoIndivWebService(id_acces: string, token: string) {
     let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     let param = new HttpParams().set('id', id_acces);
-    return this.http.get(this.individu + 'findByMatricule', { headers: headers, params: param, observe: 'response' });
+    return this.http.get(this.individu + 'individu', { headers: headers, params: param, observe: 'response' });
   }
   getmodepaiebyidaccWS(idacc: string, token: string) {
     let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
@@ -57,13 +62,13 @@ export class Ij2ServiceService {
     const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
     return this.http.post(this.demande + 'etatDossierPF', idDmd, { headers: headers, observe: 'response' });
   }
-  prendDetailDemandePF(reference: string) {
-    const headers = new HttpHeaders();
+  prendDetailDemandePF(reference: string, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     return this.http.get<any>(this.demande + 'prendDetailDemandePF?reference=' + reference, { headers: headers, observe: 'response' });
   }
 
-  prendInfoRecuParIdAccAndIdTypeInfoPF(idAcc, IdInfo) {
-    const headers = new HttpHeaders();
+  prendInfoRecuParIdAccAndIdTypeInfoPF(idAcc, IdInfo, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     return this.http.get<any>(this.demande + 'prendInfoRecuParIdAccAndIdTypeInfoPF?reference=' + idAcc + "&idTypeInfo=" + IdInfo, { headers: headers, observe: 'response' });
   }
 
@@ -89,7 +94,7 @@ export class Ij2ServiceService {
 
   getSalaireDNWS(data, token: string) {
     let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
-    return this.http.post(this.individu + 'getIndivSalaireByPeriodeAndEmpl', data, { headers: headers, observe: 'response' });
+    return this.http.post(this.dn + 'getIndivSalaireByPeriodeAndEmpl', data, { headers: headers, observe: 'response' });
   }
 
   historiqueDemandeWS(id, token: string) {
@@ -155,5 +160,61 @@ export class Ij2ServiceService {
   modifierInfoRecuParIdAccPF(tecInfoRecu: string, token :string) {
     const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
     return this.http.post(this.demande + 'modifierInfoRecuParIdAccPF', tecInfoRecu, { headers: headers, observe: 'response' });
+  }
+
+  getAllmodepaiementWS(token: string) {
+    const headers = new HttpHeaders();
+    headers.set('Authorization', 'Bearer ' + token);
+    return this.http.get<any>(this.individu + 'getallmodepaiement', {headers: headers, observe: 'response'});
+  }
+
+  listeMPbymatriculeWS(id: string, token?: string) {
+    let headers = new HttpHeaders();
+    if(token != null && token != undefined){
+      headers = new HttpHeaders({'Authorization': 'Bearer ' + token});
+    }
+    return this.http.get<any>(this.banque + 'getmodepaiementbytierstechnique?idtiers=' + id, {headers: headers, observe: 'response'});
+  }
+
+  creerModePaiementOP(idAcc, modePaiement) {
+    const mpObjet = {
+      abbrevBanque: modePaiement.abbrevBanque,
+      abrevModePaiement: modePaiement.abrevModePaiement,
+      caisse: modePaiement.caisse,
+      cle: modePaiement.cle,
+      codeAgence: modePaiement.codeAgence,
+      codeBanque: modePaiement.codeBanque,
+      codeDr: modePaiement.codeDr,
+      codeSwift: modePaiement.codeSwift,
+      compte: modePaiement.compte,
+      dateDebut: modePaiement.dateDebut,
+      dateFin: modePaiement.dateFin,
+      defaut: modePaiement.defaut,
+      domiciliation: modePaiement.domiciliation,
+      idAcc: idAcc,
+      idAgence: modePaiement.idAgence,
+      idInstitution: modePaiement.idInstitution,
+      idModePaiement: modePaiement.idModePaiement,
+      idModePaiementTiers: modePaiement.idModePaiementTiers,
+      idTiers: modePaiement.idTiers,
+      imputation: modePaiement.imputation,
+      libelleAgence: modePaiement.libelleAgence,
+      libelleBanque: modePaiement.libelleBanque,
+      nomInstitutionSortie: modePaiement.nomInstitutionSortie,
+      numCompteInstitution: modePaiement.numCompteInstitution,
+      numero: modePaiement.numero,
+      agenceotiv: modePaiement.agenceotiv,
+      codeagenceotiv: modePaiement.codeagenceotiv,
+      idbenef: modePaiement.idbenef
+    };
+    if (modePaiement.idbenef == null || modePaiement.idbenef == undefined) {
+      mpObjet.idbenef = modePaiement.idTiers;
+    }
+    return mpObjet;
+  }
+
+  updatemodepaiementop(mp) {
+    const headers = new HttpHeaders();
+    return this.http.post(this.individu + 'updatemodepaiementop', mp, { headers: headers, observe: 'response' });
   }
 }

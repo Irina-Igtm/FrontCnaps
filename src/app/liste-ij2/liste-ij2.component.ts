@@ -42,7 +42,7 @@ export class ListeIJ2Component implements OnInit {
     matricule: "",
     id_acc: "",
     prestation: "422",
-    type_etat: 1,
+    type_etat: "",
     dateReception: "",
     nom: "",
     prenom: "",
@@ -58,9 +58,7 @@ export class ListeIJ2Component implements OnInit {
   ngOnInit(): void {
     document.title = "LISTE - IJ2";
     this.accessToken = localStorage.getItem('user');
-    this.idToken = JSON.parse(this.accessToken).accessToken;
-    console.log("TOKEN" , this.idToken);
-    
+    this.idToken = JSON.parse(this.accessToken).accessToken;    
     this.pagination = 1;
     this.prendListe();
   }
@@ -81,6 +79,7 @@ export class ListeIJ2Component implements OnInit {
     this.show = true;
     this.trtsrvc.prendListeDemandePF(this.filtre, this.idToken).subscribe(data => {
       if (data.status == 200) {
+        console.log("DATA"  , data.body['list']);
         this.listDmdIj = data.body['list'];
         this.nbPage = data.body['totalPages'];
         this.show = false;

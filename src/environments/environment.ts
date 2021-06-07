@@ -13,5 +13,6 @@ export const environment = {
   accuse:'http://localhost:5459/',
   reglementOp:'http://localhost:8529/',
   banque:'http://localhost:9501/',
+  dn:'http://localhost:6146/',
 };
 

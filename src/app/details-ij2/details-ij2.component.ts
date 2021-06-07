@@ -14,6 +14,8 @@ import { DomSanitizer } from '@angular/platform-browser';
   styleUrls: ['./details-ij2.component.css']
 })
 export class DetailsIj2Component implements OnInit {
+  info_indiv: boolean = false
+  tecPcsRecMod:any[]
   indiv = {
     nom: null,
     prenoms: null,
@@ -22,7 +24,10 @@ export class DetailsIj2Component implements OnInit {
     cin: null,
     profession: null,
     sexe: null,
-    id_sexe: null
+    id_sexe: null,
+    lieu_naissance:null,
+    datecin:null,
+    numcin:null
   }
   accesindiv: any;
   inputs: any;
@@ -184,7 +189,7 @@ export class DetailsIj2Component implements OnInit {
     this.dateNow = this.datePipe.transform(new Date(Date.now()), 'yyyy-MM-dd');
     this.accessToken = localStorage.getItem('user');
     this.idToken = JSON.parse(this.accessToken).accessToken;
-    this.EtatDmd.userModif = this.user.id_acces;
+    // this.EtatDmd.userModif = this.user.id_acces;
 
     this.route.params.subscribe((params: Params) => {
       this.idDmdIJ = params['id'];
@@ -218,14 +223,20 @@ export class DetailsIj2Component implements OnInit {
         //     this.toastr.warning("Impossible de récupérer la liste des pièces jointes");
         //   }
         // });
-        this.ij2srvc.prendDetailDemandePF(this.idDmdIJ).subscribe(dataDmd => {
-          if (dataDmd.status == 200) {
+        this.ij2srvc.prendDetailDemandePF(this.idDmdIJ, this.idToken).subscribe(dataDmd => {
+          if (dataDmd.status == 200) { 
+            this.getInfoIndiv(dataDmd.body.accueilMod.id_individu)
             this.tecInfo = dataDmd.body;
+            console.log("DEMANDE" ,this.tecInfo );
             this.dmdIJ = dataDmd.body;
             this.id_employeur = this.dmdIJ.accueilMod.id_empl;
             this.id_indiv = this.dmdIJ.accueilMod.id_individu;
             this.valueBenef = this.id_indiv;
             this.champIjValueList = this.tecInfo.tecInfoRecuMod;
+            this.tecPcsRecMod = this.tecInfo.tecPcsRecMod;
+            this.montantIj1 = this.dmdIJ.infodmd.montantij1
+            console.log("MONT" , this.montantIj1);
+            
             let exception: any[];
             exception = [
               {
@@ -248,20 +259,24 @@ export class DetailsIj2Component implements OnInit {
               );
             }
             //get RefIJ1
-            this.ij2srvc.avoirRfIJ1(this.idDmdIJ, this.idToken).subscribe(data=>{
-              if(data != null){
-                  this.RefIJ1 = data.body
-              }else{
-                this.toastr.info("Réference IJ1 n'existe pas");
-              }
-            });
+            // this.ij2srvc.avoirRfIJ1(this.idDmdIJ, this.idToken).subscribe(data=>{
+            //   if(data != null){
+            //       this.RefIJ1 = data.body
+            //   }else{
+            //     this.toastr.info("Réference IJ1 n'existe pas");
+            //   }
+            // });
             
             //var makeDatePeriodeSalaire = new Date(this.ijForm.value["43"]); // DATE D'ARRET DE TRAVAIL
             this.inputs = this.ij2srvc.setValidFormDataForDynamicForms2(this.champIjValueList, exception);
             this.ijForm = this.ij2srvc.toFormGroupIJPf(this.inputs);
-            this.montantIj1 = parseFloat(this.ijForm.value["49"]).toFixed(2); // MONTANT DECLARE
+            // this.montantIj1 = parseFloat(this.ijForm.value["49"]).toFixed(2); // MONTANT DECLARE
+            // console.log("Montant IJ1" , this.montantIj1);
+
+            // this.montantIj1 = ;
+            
             // this.oldNbJours = parseInt(this.ijForm.value["52"]); // PROLONGATION
-            this.ij2srvc.prendInfoRecuParIdAccAndIdTypeInfoPF(this.RefIJ1, 2).subscribe(dateArretInfo => { // DATE D'ARRET DE TRAVAIL
+            this.ij2srvc.prendInfoRecuParIdAccAndIdTypeInfoPF(42201062110242, 2, this.idToken).subscribe(dateArretInfo => { // DATE D'ARRET DE TRAVAIL
               if (dateArretInfo.status == 200) {
                 this.dateArretTravail = dateArretInfo.body.valeur;
                 var makeDatePeriodeSalaire = new Date(dateArretInfo.body.valeur);
@@ -271,10 +286,14 @@ export class DetailsIj2Component implements OnInit {
                   idIndividu: this.dmdIJ.accueilMod.id_individu,
                   periode: this.periodeSalaire.toString()
                 };
-                this.getSalaireDn(dataDn);
+                console.log("DARA DN =", dataDn);
+                
+                let donne = this.getSalaireDn(dataDn);
+                console.log("Donne" , donne);
+                
               }
             });
-            this.ij2srvc.prendInfoRecuParIdAccAndIdTypeInfoPF(this.RefIJ1, 1).subscribe(dpaInfo => { // DPA
+            this.ij2srvc.prendInfoRecuParIdAccAndIdTypeInfoPF(42201062110242, 1, this.idToken).subscribe(dpaInfo => { // DPA
               if (dpaInfo.status == 200) {
                 this.dpa = dpaInfo.body.valeur;
               }
@@ -283,9 +302,13 @@ export class DetailsIj2Component implements OnInit {
             this.historiqueDemande(this.dmdIJ.accueilMod.id_individu);
             this.ij2srvc.infoIndivWebService(this.dmdIJ.accueilMod.id_individu, this.idToken).subscribe(dataI => {
               if (dataI.status == 200) {
+                console.log("IDIVIDU" , dataI);
+                
                 this.individu = dataI.body;
                 this.ij2srvc.getListEmployeurWS(this.dmdIJ.accueilMod.id_individu, this.idToken).subscribe(dataE => {
                   if (dataE.status == 200) {
+                    console.log("EMPLOYEUR" , dataE);
+                    
                     this.listEmployeur = dataE.body;
                   }
                 });
@@ -294,6 +317,8 @@ export class DetailsIj2Component implements OnInit {
             //getmatriculeemployeur
             this.ij2srvc.infoEmployeurWS(this.dmdIJ.accueilMod.id_empl, this.idToken).subscribe(dataInfoEmpl => {
               if (dataInfoEmpl.status == 200 && dataInfoEmpl.body != null) {
+                console.log("INFO EMPLOYEUR" , dataInfoEmpl);
+                
                 this.employeur = dataInfoEmpl.body;
                 this.estEmpl = true;
               } else {
@@ -302,6 +327,8 @@ export class DetailsIj2Component implements OnInit {
             });
             this.traitSrvc.infoAresseWS(this.dmdIJ.accueilMod.id_individu, this.idToken).subscribe(
               dataAdr => {
+                console.log("ADRESSE" , dataAdr);
+                
                 this.adresseIndividu = dataAdr.body[0];
               },
               errAdr => {
@@ -325,6 +352,8 @@ export class DetailsIj2Component implements OnInit {
     this.ij2srvc.getSalaireDNWS(dataDn, this.idToken).subscribe(
       dataDN => {
         this.montantSalaire = parseFloat(dataDN.body['montant']).toFixed(2);
+        console.log("MONTANT" , this.montantSalaire);
+        
         if (dataDN.body['montant'] === 0) {
           this.estMontantSalaireZero = true;
         }
@@ -341,13 +370,15 @@ export class DetailsIj2Component implements OnInit {
 
             // MIANTSO TOPIC NIONY
             const dataRecalcul = {
-              idAccIj1: this.idAccIj1,
+              idAccIj1: 42201062110242,
               idAccIj2: this.idDmdIJ,
               salaire: this.montantArecalculer
             };
             this.ij2srvc.decompteIj2RedressementWS(dataRecalcul, this.idToken).subscribe(dataDec => {
               if (dataDec.status == 200) {
                 this.decompte = dataDec.body;
+                console.log("DECOMPTE" , this.decompte);
+                
                 this.decompteIj2.date_debut_prenatale = this.decompte.decompte.date_debut_prenatale;
                 this.decompteIj2.dac = this.decompte.decompte.dac;
                 this.decompteIj2.dat = this.decompte.decompte.dat;
@@ -384,9 +415,10 @@ export class DetailsIj2Component implements OnInit {
           }
           else {
             this.estRedressement = false;
-            this.ij2srvc.decompteIj2WS(this.idDmdIJ, this.idToken).subscribe(data => {
+            this.ij2srvc.decompteIj2WS("42202062118342", this.idToken).subscribe(data => {
               if (data.status == 200) {
                 this.decompte = data.body;
+                console.log("DECOMPTE" , this.decompte);
 
                 this.decompteIj2.date_debut_prenatale = this.decompte.date_debut_prenatale;
                 this.decompteIj2.dac = this.decompte.dac;
@@ -601,6 +633,7 @@ export class DetailsIj2Component implements OnInit {
       if (res.status == 200) {
         this.user = res.body;
         this.accesindiv = true
+        this.info_indiv = true
           this.toastr.success("Affichage info individu avec success")
           this.indiv.nom = res.body.nom
           this.indiv.prenoms = res.body.prenoms
@@ -609,6 +642,9 @@ export class DetailsIj2Component implements OnInit {
           this.indiv.profession = res.body.profession
           this.indiv.sexe = res.body.id_sexe.libelle
           this.indiv.id_sexe = res.body.id_sexe.id_sexe
+          this.indiv.cin = res.body.cin,
+          this.indiv.lieu_naissance = res.body.lieu_naissance,
+          this.indiv.datecin =  res.body.date_cin
       } else {
         this.toastr.error('error', "Erreur de connexion")
       }

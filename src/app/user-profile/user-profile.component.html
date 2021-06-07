@@ -567,17 +567,20 @@
         <div class="row">
           <div class="col-12 form-group">
             <div class="col-md-6">
-              <ngx-select placeholder="Type" [items]="modeP" [(ngModel)]="mp.type_mdp"></ngx-select>
+              <!-- <ngx-select placeholder="Type" (select)="selectMp($event)" [items]="TypeMp" [(ngModel)]="mp.type_mdp"></ngx-select> -->
+              <select name="mp" id="mp" class="form-control" (click)="selectMp($event)" [(ngModel)]="mp.type_mdp" >
+                <option *ngFor="let mp of typeMp" value={{mp.id_mode_paiement}}>{{mp.libelle}}</option>
+              </select>
             </div>
           </div>
-          <div class="col-10 form-group" *ngIf="mp.type_mdp == 'mobile'">
+          <div class="col-10 form-group" *ngIf="mp.type_mdp == '3'">
             <div class="col-md-4">
               <mat-form-field class="example-full-width">
                 <input matInput placeholder="Numero telephone" type="text" [(ngModel)]="mp.numero" required>
               </mat-form-field>
             </div>
           </div>
-          <div class="col-12 form-group" *ngIf="mp.type_mdp == 'virement'">
+          <div class="col-12 form-group" *ngIf="mp.type_mdp == '1'">
             <div class="col-md-4">
               <mat-form-field class="example-full-width">
                 <input matInput placeholder="Banque" type="text" [(ngModel)]="mp.banque" required>

@@ -90,6 +90,17 @@ export class TraitementService {
     return this.http.post<any>(this.demande + 'ajouterDemandePF', demande, { headers: headers, observe: 'response' });
   }
 
+  getAllMp(token:string) {
+    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
+    return this.http.get<any>(this.individu + 'getallmodepaiement',  { headers: headers, observe: 'response' });
+  }
+
+  prendInfoRecuParIdAcc(reference: number ,token:string) {
+    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
+    return this.http.get<any>(this.demande + 'prendInfoRecuParIdAcc?reference='+ reference , { headers: headers, observe: 'response' });
+  }
+
+
   transformeWSReponse(wsReponse): { msg: any, success: boolean } {
     const kafkaStyle = {
       msg: null,

@@ -19,6 +19,8 @@ export class UserProfileComponent implements OnInit {
   @ViewChild('modalMP') modalMP;
   typeAdr = [{ id: 1, libelle: 'correspondance' }, { id: 2, libelle: 'physique' }];
   items: any[] = []
+  InfoIj1:any
+  droitIj1;
   idToken;
   accessToken;
   dataMP;
@@ -114,9 +116,10 @@ export class UserProfileComponent implements OnInit {
   modePaie: any;
   indiv: number;
   checkEmpl: any;
-  piece = [{ id: 1, nom: "Demande Inemnite Journalière 2" },
-  { id: 2, nom: "Certificat médical" },
-  { id: 1, nom: "Acte de naissance" }];
+  // piece = [{ id: 1, nom: "Demande Inemnite Journalière 2" },
+  // { id: 2, nom: "Certificat médical" },
+  // { id: 1, nom: "Acte de naissance" }];
+
   piesy: any[]
   // MP
   mp = {
@@ -125,11 +128,14 @@ export class UserProfileComponent implements OnInit {
     banque: null,
     agence: null,
     numero: null,
-    numero_cmpt: null
+    numero_cmpt: null,
+    id_mode_paiement :null 
   }
   typeMp = [{ nom: "virement" }, { nom: "espece" }, { nom: "mobile" }];
   modeP: any[] = []
   refAcc: any;
+  TypeMp: any[];
+  tecIj1: any[];
   constructor(
     private traitSvc: TraitementService,
     private routes: Router,
@@ -244,6 +250,7 @@ export class UserProfileComponent implements OnInit {
         this.ancien.date_dossier = this.ij1.date_dossier;
         this.ancien.observations = this.ij1.observations;
         this.Dmd.champ.accueilMod.idIndividu = this.ij1.id_individu;
+        this.tecInfoIj1(this.ancien.id_acc)
         if (this.ij1.etat == 1) {
           this.ancien.etat = "Demande IJ1 validée"
         } else {
@@ -254,6 +261,8 @@ export class UserProfileComponent implements OnInit {
             const nbjrij1 = data.body;
             this.traitSvc.decompteIjWS(this.ancien.id_acc, this.idToken).subscribe(result => {
               if (result.status == 200 && result.body != null) {
+                console.log("RESULTAT DROIT IJ1" , result.body);  
+                this.InfoIj1 = result.body
                 const decom = result.body;
                 this.ancien.dat = decom.dat;
                 this.ancien.dpa = decom.dpa;
@@ -267,6 +276,7 @@ export class UserProfileComponent implements OnInit {
                 this.ancien.prenatale = decom.prenatale;
                 this.ancien.ij1 = decom.ij1;
                 this.ancien.salaire = decom.salaire;
+                // this.droitIj1 = (this.ancien.prenatale+this.ancien.postnatale)*this.ancien.demisalaire
               }
             })
           }
@@ -277,6 +287,14 @@ export class UserProfileComponent implements OnInit {
       }
     })
     this.getAdresse(matricule)
+  }
+
+  tecInfoIj1(ref){
+    this.traitSvc.prendInfoRecuParIdAcc(ref, this.idToken).subscribe(res =>{
+      if (res.status == 200) {
+        this.tecIj1 = res.body
+      }
+    })
   }
 
   prendReferenceDemande() {
@@ -320,6 +338,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   showModalMP() {
+    this.getAllMp()
     $(this.modalMP.nativeElement).modal('show');
   }
 
@@ -328,6 +347,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   showModalAdresse() {
+   ;
     $(this.ajputAdresse.nativeElement).modal('show');
   }
 
@@ -338,11 +358,11 @@ export class UserProfileComponent implements OnInit {
   ajouterMP() {
     this.dataMP = {
       id_individu: this.Dmd.champ.accueilMod.idIndividu,
-      type_mdp: this.mp.type_mdp,
       banque: this.mp.banque,
       agence: this.mp.agence,
       numero: this.mp.numero,
-      numero_cmpt: this.mp.numero_cmpt
+      numero_cmpt: this.mp.numero_cmpt,
+      id_mode_paiement: this.mp.type_mdp
     }
     this.traitSvc.saveModepaie(this.dataMP, this.idToken).subscribe(res => {
       if (res.status == 200) {
@@ -422,11 +442,11 @@ export class UserProfileComponent implements OnInit {
 
   insererDemande() {
     let msg = {}
-    this.piesy = [];
-    for (let i = 0; i < this.piece.length; i++) {
-      const element = this.piece[i].nom;
-      this.piesy.push(element)
-    }
+    // this.piesy = [];
+    // for (let i = 0; i < this.piece.length; i++) {
+    //   const element = this.piece[i].nom;
+    //   this.piesy.push(element)
+    // }
     msg = {
       accueilMod: {
         id_acc: this.referenceDemandeIj,
@@ -439,13 +459,27 @@ export class UserProfileComponent implements OnInit {
         num_doss: "",
         observations: " Demande indemnité journalière 2 ème tranche"
       },
-      tecInfoRecuMod: [],
-      tecPcsRecMod: [],
+      tecInfoRecuMod: this.tecIj1,
+      infodmd:{
+        montantij1: this.ancien.salaire,
+        demisalaire:this.ancien.demisalaire,
+        nbrjrpost:this.ancien.nbjourpost,
+        nbjrpre:this.ancien.nbjourpre,
+        nationaliote:this.individu.nationalite,
+        sexe:this.individu.sexe,
+        dateDossier:this.ancien.date_dossier,
+        observations:this.ancien.observations,
+        droipost:this.ancien.postnatale,
+        droitpre:this.ancien.prenatale,
+        reference:this.referenceDemandeIj
+      }
+
     };
     
     this.traitSvc.saveDemande(msg, this.idToken).subscribe(res => {
       let dataSave = this.traitSvc.transformeWSReponse(res);
       if (dataSave.success) {
+        console.log("DONNEES DEMADE",  msg);
         this.saveAccuse();
         localStorage.setItem("stock", JSON.stringify(msg));
         localStorage.getItem('user');
@@ -502,6 +536,15 @@ export class UserProfileComponent implements OnInit {
     }
   }
 
+  getAllMp(){
+    this.typeMp = []
+    this.traitSvc.getAllMp(this.idToken).subscribe(res =>{
+      if (res.status == 200) {
+       this.typeMp = res.body
+      }
+    })
+  }
+
   saveAccuse() {
     let accuseMsg = {}
     accuseMsg = {
@@ -545,6 +588,11 @@ export class UserProfileComponent implements OnInit {
 
   versNoteRetour(reference){
     this.routes.navigate(['/accusereception/'+reference])
+  }
+
+  selectMp(index){
+    console.log(index.target.value);
+    this.mp.type_mdp = index.target.value
   }
 
 }
