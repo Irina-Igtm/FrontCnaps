@@ -13,6 +13,7 @@ import { ComponentsModule } from './components/components.module';
 
 import { AppComponent } from './app.component';
 
+
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { TableListComponent } from './table-list/table-list.component';
@@ -43,6 +44,8 @@ import { AccuseReceptionComponent } from './accuse-reception/accuse-reception.co
 import { OpIj2Component } from './op-ij2/op-ij2.component';
 import { DetailsIj2Component } from './details-ij2/details-ij2.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { UploadFilesComponent } from './components/upload-files/upload-files.component';
+
 enableProdMode();
 
 @NgModule({
@@ -78,6 +81,7 @@ enableProdMode();
     AccuseReceptionComponent,
     OpIj2Component,
     DetailsIj2Component,
+    UploadFilesComponent,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },

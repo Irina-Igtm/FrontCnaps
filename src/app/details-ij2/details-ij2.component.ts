@@ -2,11 +2,12 @@ import { ToastrService } from 'ngx-toastr';
 import { Router, Params, ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, ViewChild } from '@angular/core';
 import { TraitementService } from './../services/traitement/traitement.service';
 import { Ij2ServiceService } from '../services/ij2-service.service';
 import { DomSanitizer } from '@angular/platform-browser';
 
+declare var $: any;
 
 @Component({
   selector: 'app-details-ij2',
@@ -14,8 +15,17 @@ import { DomSanitizer } from '@angular/platform-browser';
   styleUrls: ['./details-ij2.component.css']
 })
 export class DetailsIj2Component implements OnInit {
+  @Input() idEmplChoisi
+  @Output() emplTrouve = new EventEmitter();
+  @Output() modifTermine = new EventEmitter();
+  @ViewChild('dossierRefu') dossierRefu;
+  listeChamps;
+  enCours = false;
+  listeAutreEtat = [];
+  afficheCIE = false;
+  that = this
   info_indiv: boolean = false
-  tecPcsRecMod:any[]
+  tecPcsRecMod: any[]
   indiv = {
     nom: null,
     prenoms: null,
@@ -25,13 +35,13 @@ export class DetailsIj2Component implements OnInit {
     profession: null,
     sexe: null,
     id_sexe: null,
-    lieu_naissance:null,
-    datecin:null,
-    numcin:null
+    lieu_naissance: null,
+    datecin: null,
+    numcin: null
   }
   accesindiv: any;
   inputs: any;
-  RefIJ1: any ;
+  RefIJ1: any;
   dataMP;
   accessToken: any;
   public show = false;
@@ -39,7 +49,6 @@ export class DetailsIj2Component implements OnInit {
   dmdIJ: any;
   employeur: any;
   individu: any;
-  listeAutreEtat = [];
   valueBenef: any;
   nouveauEtat: any;
   adresseIndividu: any;
@@ -155,6 +164,11 @@ export class DetailsIj2Component implements OnInit {
   afficheChangeMP = true;
 
   idToken;
+
+  ListeEmployeur;
+  indice;
+  flecheDroite = ">";
+  flecheGauche = "<";
   // MP
   mp = {
     id_individu: null,
@@ -165,7 +179,14 @@ export class DetailsIj2Component implements OnInit {
     numero_cmpt: null
   }
 
-  listeMP: any;
+  listeMP: any[];
+  mpActuel = {
+    typeLibelle: "",
+    typeAbrev: "",
+    lieuAgence: "",
+    mp: null
+  };
+  aucunTrouve = false;
   constructor(
     private traitSrvc: TraitementService,
     private ij2srvc: Ij2ServiceService,
@@ -175,6 +196,7 @@ export class DetailsIj2Component implements OnInit {
     private route: ActivatedRoute,
     private toastr: ToastrService,
     private sanitizer: DomSanitizer,
+
 
   ) {
     this.validForm = this.fb.group({
@@ -190,9 +212,9 @@ export class DetailsIj2Component implements OnInit {
     this.accessToken = localStorage.getItem('user');
     this.idToken = JSON.parse(this.accessToken).accessToken;
     // this.EtatDmd.userModif = this.user.id_acces;
-
     this.route.params.subscribe((params: Params) => {
       this.idDmdIJ = params['id'];
+      console.log("ID ACC", this.idDmdIJ);
       this.EtatDmd.idAcc = this.idDmdIJ;
       this.ij2srvc.getEtatDmdWS(this.idDmdIJ, this.idToken).subscribe(dataEtat => {
         if (dataEtat.status == 200) {
@@ -210,24 +232,20 @@ export class DetailsIj2Component implements OnInit {
               this.toastr.warning("Impossible de récupérer la liste des états de demande");
             }
           });
-          this.cant_validate = dataEtat.body['etat'] == 3 ? false : true;
+          this.cant_validate = dataEtat.body['etat'] == 2 ? false : true;
+          console.log("ETAT ANLE DEMANDE" , this.cant_validate)
         } else {
           this.toastr.warning("Impossible de récupérer l'état de la demande");
         }
-        // let query = new FileModel();
-        // query.id_files = this.idDmdIJ;
-        // this.fileService.readQueryWS(query).subscribe(data => {
-        //   if (data.status == 200) {
-        //     this.pieces = <any>data.body;
-        //   } else {
-        //     this.toastr.warning("Impossible de récupérer la liste des pièces jointes");
-        //   }
-        // });
+
         this.ij2srvc.prendDetailDemandePF(this.idDmdIJ, this.idToken).subscribe(dataDmd => {
-          if (dataDmd.status == 200) { 
+          if (dataDmd.status == 200) {
+            console.log("ITO MATRICULE", dataDmd.body.accueilMod.id_individu)
             this.getInfoIndiv(dataDmd.body.accueilMod.id_individu)
+            this.getInfoEMployeur(dataDmd.body.accueilMod.id_individu)
+            this.getMPIndiv()
+            this.prendListeMP(dataDmd.body.accueilMod.id_individu)
             this.tecInfo = dataDmd.body;
-            console.log("DEMANDE" ,this.tecInfo );
             this.dmdIJ = dataDmd.body;
             this.id_employeur = this.dmdIJ.accueilMod.id_empl;
             this.id_indiv = this.dmdIJ.accueilMod.id_individu;
@@ -235,8 +253,6 @@ export class DetailsIj2Component implements OnInit {
             this.champIjValueList = this.tecInfo.tecInfoRecuMod;
             this.tecPcsRecMod = this.tecInfo.tecPcsRecMod;
             this.montantIj1 = this.dmdIJ.infodmd.montantij1
-            console.log("MONT" , this.montantIj1);
-            
             let exception: any[];
             exception = [
               {
@@ -266,7 +282,7 @@ export class DetailsIj2Component implements OnInit {
             //     this.toastr.info("Réference IJ1 n'existe pas");
             //   }
             // });
-            
+
             //var makeDatePeriodeSalaire = new Date(this.ijForm.value["43"]); // DATE D'ARRET DE TRAVAIL
             this.inputs = this.ij2srvc.setValidFormDataForDynamicForms2(this.champIjValueList, exception);
             this.ijForm = this.ij2srvc.toFormGroupIJPf(this.inputs);
@@ -274,7 +290,7 @@ export class DetailsIj2Component implements OnInit {
             // console.log("Montant IJ1" , this.montantIj1);
 
             // this.montantIj1 = ;
-            
+
             // this.oldNbJours = parseInt(this.ijForm.value["52"]); // PROLONGATION
             this.ij2srvc.prendInfoRecuParIdAccAndIdTypeInfoPF(42201062110242, 2, this.idToken).subscribe(dateArretInfo => { // DATE D'ARRET DE TRAVAIL
               if (dateArretInfo.status == 200) {
@@ -286,11 +302,7 @@ export class DetailsIj2Component implements OnInit {
                   idIndividu: this.dmdIJ.accueilMod.id_individu,
                   periode: this.periodeSalaire.toString()
                 };
-                console.log("DARA DN =", dataDn);
-                
                 let donne = this.getSalaireDn(dataDn);
-                console.log("Donne" , donne);
-                
               }
             });
             this.ij2srvc.prendInfoRecuParIdAccAndIdTypeInfoPF(42201062110242, 1, this.idToken).subscribe(dpaInfo => { // DPA
@@ -302,13 +314,13 @@ export class DetailsIj2Component implements OnInit {
             this.historiqueDemande(this.dmdIJ.accueilMod.id_individu);
             this.ij2srvc.infoIndivWebService(this.dmdIJ.accueilMod.id_individu, this.idToken).subscribe(dataI => {
               if (dataI.status == 200) {
-                console.log("IDIVIDU" , dataI);
-                
+                this.info_indiv = true
+                console.log("individu informations:", dataI);
                 this.individu = dataI.body;
                 this.ij2srvc.getListEmployeurWS(this.dmdIJ.accueilMod.id_individu, this.idToken).subscribe(dataE => {
                   if (dataE.status == 200) {
-                    console.log("EMPLOYEUR" , dataE);
-                    
+                    // console.log("EMPLOYEUR" , dataE);
+
                     this.listEmployeur = dataE.body;
                   }
                 });
@@ -317,8 +329,8 @@ export class DetailsIj2Component implements OnInit {
             //getmatriculeemployeur
             this.ij2srvc.infoEmployeurWS(this.dmdIJ.accueilMod.id_empl, this.idToken).subscribe(dataInfoEmpl => {
               if (dataInfoEmpl.status == 200 && dataInfoEmpl.body != null) {
-                console.log("INFO EMPLOYEUR" , dataInfoEmpl);
-                
+                // console.log("INFO EMPLOYEUR" , dataInfoEmpl);
+
                 this.employeur = dataInfoEmpl.body;
                 this.estEmpl = true;
               } else {
@@ -327,8 +339,8 @@ export class DetailsIj2Component implements OnInit {
             });
             this.traitSrvc.infoAresseWS(this.dmdIJ.accueilMod.id_individu, this.idToken).subscribe(
               dataAdr => {
-                console.log("ADRESSE" , dataAdr);
-                
+                console.log("ADRESSE", dataAdr);
+
                 this.adresseIndividu = dataAdr.body[0];
               },
               errAdr => {
@@ -345,6 +357,13 @@ export class DetailsIj2Component implements OnInit {
       });
 
     });
+    this.ij2srvc.prendInfoRecuParIdAccPF("42202062118342", this.idToken).subscribe(liste => {
+      if (liste.status == 200) {
+        this.listeChamps = liste.body;
+        console.log("LISTECHAMPS", this.listeChamps);
+
+      }
+    });
   }
 
 
@@ -352,8 +371,6 @@ export class DetailsIj2Component implements OnInit {
     this.ij2srvc.getSalaireDNWS(dataDn, this.idToken).subscribe(
       dataDN => {
         this.montantSalaire = parseFloat(dataDN.body['montant']).toFixed(2);
-        console.log("MONTANT" , this.montantSalaire);
-        
         if (dataDN.body['montant'] === 0) {
           this.estMontantSalaireZero = true;
         }
@@ -377,8 +394,8 @@ export class DetailsIj2Component implements OnInit {
             this.ij2srvc.decompteIj2RedressementWS(dataRecalcul, this.idToken).subscribe(dataDec => {
               if (dataDec.status == 200) {
                 this.decompte = dataDec.body;
-                console.log("DECOMPTE" , this.decompte);
-                
+                console.log("DECOMPTE", this.decompte);
+
                 this.decompteIj2.date_debut_prenatale = this.decompte.decompte.date_debut_prenatale;
                 this.decompteIj2.dac = this.decompte.decompte.dac;
                 this.decompteIj2.dat = this.decompte.decompte.dat;
@@ -418,7 +435,7 @@ export class DetailsIj2Component implements OnInit {
             this.ij2srvc.decompteIj2WS("42202062118342", this.idToken).subscribe(data => {
               if (data.status == 200) {
                 this.decompte = data.body;
-                console.log("DECOMPTE" , this.decompte);
+                console.log("DECOMPTE", this.decompte);
 
                 this.decompteIj2.date_debut_prenatale = this.decompte.date_debut_prenatale;
                 this.decompteIj2.dac = this.decompte.dac;
@@ -466,11 +483,15 @@ export class DetailsIj2Component implements OnInit {
             this.listeAutreEtat.push(temp[i]);
           }
         }
+        console.log("ETAT BE", this.listeAutreEtat);
+
       }
-    })
+    });
   }
 
- infosFamille(id) {
+
+
+  infosFamille(id) {
     this.traitSrvc.infoFamille(id, this.idToken).subscribe(
       data => {
         if (data.status == 200) {
@@ -506,7 +527,7 @@ export class DetailsIj2Component implements OnInit {
 
 
   onClickPiece(piece_file, name) {
-    
+
     window.open(piece_file, name);
   }
 
@@ -558,17 +579,18 @@ export class DetailsIj2Component implements OnInit {
   }
 
   onAcceptCLick() {
+    console.log("MONTANT DROIT :" , this.montantOP);
     if (this.montantOP > 0) {
       this.show = true;
       const formValue = this.validForm.value;
       let that = this;
-      this.traitSrvc.listeMP(this.dmdIJ.accueilMod.id_acc, this.idToken).subscribe(
+      this.ij2srvc.getMPDmd(this.dmdIJ.accueilMod.id_acc, this.idToken).subscribe(
         obsMP => {
-          if (obsMP.status == 200 && obsMP.body != null && obsMP.body.modepaiement != null) {
+          if (obsMP.status == 200 && obsMP.body != null && obsMP.body != null) {
             let objetOP = {
               id_prestation: this.PRESTATION,
-              id_benef: obsMP.body.idbenef != null ? obsMP.body.idbenef : obsMP.body.idTiers,
-              id_mode_paiement: null,
+              // id_benef: obsMP.body.idbenef != null ? obsMP.body.idbenef : obsMP.body.idTiers,
+              id_mode_paiement: this.mpActuel.mp.id_modepaieDmd,
               id_adresse: null,
               id_compte: null,
               id_individu: this.individu.id_individu,
@@ -576,14 +598,16 @@ export class DetailsIj2Component implements OnInit {
               id_empl: this.dmdIJ.accueilMod.id_empl,
               montant: this.montantOP,
               flag_op: "N",
+              id_benef:this.individu.id_individu,
               id_demande: this.dmdIJ.accueilMod.id_acc
             };
-            objetOP.id_mode_paiement = obsMP.body.idModePaiementTiers;
+            objetOP.id_mode_paiement = this.mpActuel.mp.id_modepaieDmd;
             let observ = that.traitSrvc.infoAresseWS(that.individu.id_individu, this.idToken).subscribe(
               obsA => {
                 if (obsA.body != null && obsA.body['length'] > 0) {
                   objetOP.id_adresse = obsA.body[0].id_adresse;
-                  // that.effectuerGroupementPourOP(objetOP);
+                  console.log("OBJECTOP" ,  objetOP);
+                  that.effectuerGroupementPourOP(objetOP);
                 }
                 else {
                   that.toastr.info("L'individu n'a pas d'adresse", 'Info');
@@ -598,7 +622,7 @@ export class DetailsIj2Component implements OnInit {
           } else {
             that.show = true;
             this.ajouterMP();
-            // that.toastr.warning("Le mode de paiement lié à cette demande est introuvable", "Service non valable");
+            that.toastr.warning("Le mode de paiement lié à cette demande est introuvable", "Service non valable");
           }
         },
         erreur => {
@@ -608,6 +632,58 @@ export class DetailsIj2Component implements OnInit {
     } else {
       this.toastr.warning("Montant droit invalide");
     }
+  }
+
+  effectuerGroupementPourOP(objetOP) {
+    let that = this;
+    this.ij2srvc.saveTecoptempWS(objetOP, this.idToken).subscribe(
+      obsO => {
+        that.toastr.success("Opération terminée, la demande est ajoutée en file d'attente d'OP");
+        const cc = this.validForm.value;
+        this.EtatDmd.idTypeEtat = 2;
+        this.EtatDmd.observations = cc.observations;
+        this.EtatDmd.observationsSem = "";
+        let argument = {
+          etat: this.EtatDmd.idTypeEtat,
+          idacc: this.EtatDmd.idAcc,
+          observation: this.EtatDmd.observations,
+          observationSem: this.EtatDmd.observationsSem,
+          userModif: this.EtatDmd.userModif
+        };
+        this.ij2srvc.changerEtatDemandePF(argument, this.idToken).subscribe(dataWS => {
+          if(dataWS.status == 200){
+            localStorage.setItem("ValideOp", JSON.stringify(argument));
+            that.toastr.success("Etat de la demande modifié");
+                 }
+        });
+        // let notifMessage = 'Votre demande d\'indemnité journalière 1ère tranche: ref - ' + this.dmdIJ.accueilMod.id_acc + ' a été validée.';
+        // let dateToday = that.datePipe.transform(new Date(Date.now()), 'yyyy-MM-dd');
+        // let content = {
+        //   expediteur: JSON.parse(localStorage.getItem('user')).id_acces,
+        //   destinataire: that.individu.id_individu,
+        //   titre: 'Demande IJ1',
+        //   message: notifMessage,
+        //   typeNotif: '',
+        //   dateEnvoi: dateToday,
+        //   referenceNotif: 'Préstation familiale'
+        // // };
+        // if (that.ui.EST_PROD) {
+        //   that.notificationService.sendNotif(that.individu.id_individu, content).then(() => {
+        //     that.toastr.success('Notification envoyé');
+        //   }, (err) => {
+        //     that.toastr.warning('Notification non envoyé');
+        //   });
+        // }
+        setTimeout(() => {
+          that.routes.navigate(['/listeij2']);
+        }, 500);
+        that.show = false;
+      },
+      err => {
+        that.show = false;
+        that.toastr.warning("Impossible de procéder à la validation de la demande");
+      }
+    );
   }
 
   onChangeEtat(val) {
@@ -629,25 +705,222 @@ export class DetailsIj2Component implements OnInit {
 
   getInfoIndiv(matricule) {
     this.traitSrvc.infoIndividu(matricule, this.idToken).subscribe(res => {
-      console.log("INFO INDIV =", res)
       if (res.status == 200) {
         this.user = res.body;
         this.accesindiv = true
         this.info_indiv = true
-          this.toastr.success("Affichage info individu avec success")
-          this.indiv.nom = res.body.nom
-          this.indiv.prenoms = res.body.prenoms
-          this.indiv.date_naissance = res.body.date_naissance
-          this.indiv.nationalite = res.body.id_nationalite.libelle
-          this.indiv.profession = res.body.profession
-          this.indiv.sexe = res.body.id_sexe.libelle
-          this.indiv.id_sexe = res.body.id_sexe.id_sexe
-          this.indiv.cin = res.body.cin,
+        this.toastr.success("Affichage info individu avec success")
+        this.indiv.nom = res.body.nom
+        this.indiv.prenoms = res.body.prenoms
+        this.indiv.date_naissance = res.body.date_naissance
+        this.indiv.nationalite = res.body.id_nationalite.libelle
+        this.indiv.profession = res.body.profession
+        this.indiv.sexe = res.body.id_sexe.libelle
+        this.indiv.id_sexe = res.body.id_sexe.id_sexe
+        this.indiv.cin = res.body.cin,
           this.indiv.lieu_naissance = res.body.lieu_naissance,
-          this.indiv.datecin =  res.body.date_cin
+          this.indiv.datecin = res.body.date_cin
       } else {
         this.toastr.error('error', "Erreur de connexion")
       }
     })
   }
+
+  getInfoEMployeur(matricule) {
+    let that = this;
+    that.traitSrvc.getEmployeur(matricule, this.idToken).subscribe(obsE => {
+      console.log("findListSigemploisuccByIdIndividuWS :", obsE);
+      let obs = this.traitSrvc.transformeWSReponse(obsE);
+      if (obs.success && obs.msg != null && obs.msg.length > 0) {
+        obs.msg.sort((a, b) => {
+          if (a.sig.date_debut_contrat < b.date_debut_contrat) {
+            return -1;
+          }
+          else if (a.sig.date_debut_contrat > b.date_debut_contrat) {
+            return 1;
+          }
+          return 0;
+        });
+        for (let i = 0; i < obs.msg.length; i++) {
+          if (obs.msg[i].sig.id_empl.id_empl == that.idEmplChoisi) {
+            that.indice = i;
+            that.emplTrouve.emit(obs.msg[i]);
+            break;
+          }
+        }
+        if (that.indice == undefined && that.indice == null) {
+          that.indice = 0;
+        }
+        that.ListeEmployeur = obs.msg;
+        console.log("EMPLOYEUR use :", this.ListeEmployeur);
+
+      }
+    });
+
+  }
+
+  change(sens) {
+    console.log("SENS", sens);
+
+    this.indice += sens;
+    this.afficheCIE = false;
+  }
+  getMPIndiv() {
+    let that = this;
+    // prend la liste des modes de paiement
+    this.ij2srvc.getAllmodepaiementWS(this.idToken).subscribe(obsLMP => {
+      if (obsLMP.status == 200) {
+        that.listeModePaiement = obsLMP.body;
+        this.ij2srvc.getMPDmd(this.idDmdIJ, this.idToken).subscribe(obs => {
+          if (obs.status == 200 && obs.body != null) {
+            that.mpActuel.mp = obs.body
+            console.log("id", that.mpActuel.mp);
+
+            that.mpActuel.typeLibelle = that.mpActuel.mp.banque;
+            that.mpActuel.typeAbrev = that.mpActuel.mp.agence;
+          }
+          else {
+            that.aucunTrouve = true;
+          }
+        });
+      }
+    });
+  }
+
+  prendListeMP(matricule) {
+    let that = this;
+    this.traitSrvc.listeMP(matricule, this.idToken).subscribe(obs => {
+      console.log("listeMPbymatricule => " + matricule, obs);
+      if (obs.status == 200) {
+        this.listeMP = [];
+        for (let l of obs.body) {
+          let mp = {
+            mp: l,
+            estCoche: false
+          };
+          if (that.mpActuel.mp != null && that.mpActuel.mp.idModePaiementTiers == l.idModePaiementTiers) {
+            mp.estCoche = true;
+          }
+          this.listeMP.push(mp);
+        }
+        console.log("KIVY", this.listeMP);
+
+      }
+    });
+  }
+
+  checkChange(index) {
+    console.log("checkChange ", index);
+    // for (let i = 0; i < this.listeMP.length; i++) {
+    //   if (index != i) {
+    //     this.listeMP[i].estCoche = false;
+    //   }
+    // }
+  }
+
+  validerChoixMp() {
+    let modePaiement = null;
+    //gettMpdmd
+    console.log("validerChoixMp modePaiement", modePaiement);
+    if (modePaiement != null) {
+      if (this.aucunTrouve) {
+        this.traitSrvc.saveModepaie(modePaiement, this.idToken).subscribe(obs => {
+          console.log("ajouttrsmodepaieWS", obs);
+          if (obs.status == 200) {
+            this.traitement(modePaiement);
+            this.toastr.success("Le mode de paiement pour cette demande a été modifié");
+          }
+          else {
+            this.toastr.info("Impossible de modifier le mode de paiement");
+          }
+        });
+      }
+      else {
+        this.ij2srvc.updatemodepaiementop(modePaiement).subscribe(obs => {
+          console.log("updatemodepaiementop", obs);
+          if (obs.status == 200) {
+            this.traitement(modePaiement);
+            this.toastr.success("Le mode de paiement pour cette demande a été modifié");
+          }
+          else {
+            this.toastr.info("Impossible de modifier le mode de paiement");
+          }
+        });
+      }
+    }
+    else {
+      this.toastr.info("Vous n'avez choisi aucun mode de paiement");
+    }
+  }
+
+  traitement(modePaiement) {
+    if (this.mpActuel.mp == null) {
+      this.mpActuel.mp = {};
+    }
+    for (let attr in modePaiement) {
+      this.mpActuel.mp[attr] = modePaiement[attr];
+    }
+    for (let mp of this.listeModePaiement) {
+      if (mp.id_mode_paiement == this.mpActuel.mp.id_mode_paiement) {
+        this.mpActuel.typeLibelle = mp.banque;
+        this.mpActuel.lieuAgence = this.mpActuel.mp.agence;
+        break;
+      }
+    }
+  }
+
+  imprimerPDF() {
+    this.enPDF = true;
+    let that = this;
+    // $('#decompte').modal('hide');
+    $(".footer_cnaps").hide();
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => {
+        that.enPDF = false;
+        $(".footer_cnaps").show();
+      }, 1000);
+    }, 2000);
+  }
+
+  dossierRefuse() {
+    if (this.nouveauEtat === null || this.nouveauEtat === undefined || this.nouveauEtat === "") {
+      this.toastr.warning('Il est impératif de choisir l\'état de la demande');
+    }
+    else if (this.dossierMessage === null || this.dossierMessage === undefined || this.dossierMessage === "") {
+      this.toastr.warning('Veuillez écrire un méssage ou un motif');
+    }
+    else {
+      this.EtatDmd.observations = this.dossierMessage;
+      let argument = {
+        etat: this.EtatDmd.idTypeEtat,
+        idacc: this.EtatDmd.idAcc,
+        observation: this.EtatDmd.observations,
+        observationSem: this.EtatDmd.observationsSem,
+        userModif: this.EtatDmd.userModif
+      };
+      this.ij2srvc.changerEtatDemandePF(argument, this.idToken).subscribe(data => {
+        if (data.status == 200) {
+          this.toastr.success('Change état success');
+          $('#dossierRefu').modal('hide');
+          this.notification = this.notification.trim();
+          const notifMessage = this.notification == "" ? "Demande d'indemnité journalière 2ème tranche ref - " + this.idDmdIJ + " réfusée." : this.notification;
+          const dateToday = this.datePipe.transform(new Date(Date.now()), 'yyyy-MM-dd');
+          const content = {
+            expediteur: JSON.parse(localStorage.getItem('user')).id_acces,
+            destinataire: this.individu.id_individu,
+            titre: "Demande d'indemnité journalière 2ème tranche",
+            message: notifMessage,
+            typeNotif: '',
+            dateEnvoi: dateToday,
+            referenceNotif: 'Préstation familiale'
+          };
+          this.routes.navigate(['/listeij2']);
+        } else {
+          this.toastr.warning("Erreur changement d'état");
+        }
+      });
+    }
+  }
+
 }

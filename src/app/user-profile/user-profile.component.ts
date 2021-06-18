@@ -1,10 +1,15 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
+import { InputBase } from './../services/input-service/input-base';
 import { Router } from '@angular/router';
 import { TraitementService } from './../services/traitement/traitement.service';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { DatePipe } from '@angular/common';
 import { Ij2ServiceService } from '../services/ij2-service.service';
-
+import { FileModel } from 'app/models/file-model';
+import { ThrowStmt } from '@angular/compiler';
+import { data } from 'jquery';
 
 
 declare var $: any;
@@ -14,12 +19,27 @@ declare var $: any;
   styleUrls: ['./user-profile.component.css']
 })
 export class UserProfileComponent implements OnInit {
+  //pièces justificatives
+  name: any;
+  type: any;
+  picByte: any;
+
+  page:any;
+  max:any;
+  nbPage:any;
+  selectedFile: File;
+  retrievedImage: any;
+  base64Data: any;
+  retrieveResonse: any;
+  message: string;
+  imageName: any;
   @ViewChild('matricule') matricule;
   @ViewChild('ajputAdresse') ajputAdresse;
   @ViewChild('modalMP') modalMP;
   typeAdr = [{ id: 1, libelle: 'correspondance' }, { id: 2, libelle: 'physique' }];
+  modepaietiers;
   items: any[] = []
-  InfoIj1:any
+  InfoIj1: any
   droitIj1;
   idToken;
   accessToken;
@@ -109,6 +129,15 @@ export class UserProfileComponent implements OnInit {
     sexe: null,
     id_sexe: null
   }
+  rechercheIndiv: any;
+  matriculeIndividu: any
+  param = {
+    nom: "",
+    prenoms: "",
+    date_naissance: "",
+    cin: ""
+  }
+  ListIndiv: any
   // Famille
   famille: any;
   listeEmpl: any;
@@ -129,20 +158,62 @@ export class UserProfileComponent implements OnInit {
     agence: null,
     numero: null,
     numero_cmpt: null,
-    id_mode_paiement :null 
+    id_mode_paiement: null,
+    caisse: null
+  }
+
+  mpDmd = {
+    id_individu: null,
+    banque: null,
+    agence: null,
+    numero: null,
+    numero_cmpt: null,
+    id_mode_paiement: null,
+    caisse: null
   }
   typeMp = [{ nom: "virement" }, { nom: "espece" }, { nom: "mobile" }];
   modeP: any[] = []
   refAcc: any;
   TypeMp: any[];
   tecIj1: any[];
+
+  //Pièces
+  show: boolean = false;
+  prolongation: any;
+  @Input() pieces: InputBase<any>[] = [];
+  @Input() peaces: InputBase<any>;
+  @Input() inputs: InputBase<any>[] = [];
+  @Input() idfiles: string;
+  @Input() form: FormGroup;
+  ijForm: FormGroup
+  private fb: FormBuilder
+  isChecked: boolean;
+  testNom = [];
+  autrePieces = [];
+  autrePieceValue = [];
+  nomFichier = [];
+  code_prestation = 422;
+  @Input() accept: string = null;
+  piecesAccuse = [];
+  id_demande: any
+
+  //info
+  employeur: any;
+
   constructor(
     private traitSvc: TraitementService,
     private routes: Router,
     private toastr: ToastrService,
     private datePipe: DatePipe,
-    private ij2srvc: Ij2ServiceService
-  ) { }
+    private ij2srvc: Ij2ServiceService,
+    private http: HttpClient
+  ) {
+    // this.ijForm = this.fb.group({
+    //   'matrIndiv': ['']
+    //   //   'employeur': ['']
+    // });
+    this.isChecked = true;
+  }
 
   ngOnInit() {
     document.title = "DEMANDE - IJ2";
@@ -152,7 +223,14 @@ export class UserProfileComponent implements OnInit {
     this.getTypeAdr();
     for (let i = 0; i < this.typeMp.length; i++) {
       this.modeP.push({ id: this.typeMp[i].nom, text: this.typeMp[i].nom })
-    }
+    } this.rechercheIndiv = {
+      id_individu: null,
+      nom: null,
+      prenoms: null,
+      date_naissance: null,
+      cin: null
+    };
+
   }
 
   valideMatricule(index) {
@@ -176,9 +254,9 @@ export class UserProfileComponent implements OnInit {
   getModePayement(matricule) {
     this.traitSvc.listeMP(matricule, this.idToken).subscribe(res => {
       if (res.status == 200) {
-        this.listeMP = res.body
-        console.log("MP", this.listeMP);
+        console.log(res);
 
+        this.listeMP = res.body
       } else {
         this.toastr.error('error', "Erreur de connexion Mode de payement")
       }
@@ -186,6 +264,8 @@ export class UserProfileComponent implements OnInit {
   }
 
   modePaiementChange(mp) {
+    console.log("MODE PAIEMENT", mp);
+
     this.modePaie = mp;
   }
 
@@ -251,17 +331,20 @@ export class UserProfileComponent implements OnInit {
         this.ancien.observations = this.ij1.observations;
         this.Dmd.champ.accueilMod.idIndividu = this.ij1.id_individu;
         this.tecInfoIj1(this.ancien.id_acc)
-        if (this.ij1.etat == 1) {
-          this.ancien.etat = "Demande IJ1 validée"
-        } else {
-          this.ancien.etat = "Demande IJ1 en attente de validation"
+        if (this.ij1.etat == 2) {
+          this.ancien.etat = "Demande validée"
+        } else if (this.ij1.etat == 1) {
+
+          this.ancien.etat = "Demande en attente de validatien"
+
         }
+
         this.traitSvc.getnombredejourij1WS(this.ij1.id_acc.toString(), this.idToken).subscribe(data => {
           if (data.status == 200) {
             const nbjrij1 = data.body;
             this.traitSvc.decompteIjWS(this.ancien.id_acc, this.idToken).subscribe(result => {
               if (result.status == 200 && result.body != null) {
-                console.log("RESULTAT DROIT IJ1" , result.body);  
+                console.log("RESULTAT DROIT IJ1", result.body);
                 this.InfoIj1 = result.body
                 const decom = result.body;
                 this.ancien.dat = decom.dat;
@@ -276,7 +359,6 @@ export class UserProfileComponent implements OnInit {
                 this.ancien.prenatale = decom.prenatale;
                 this.ancien.ij1 = decom.ij1;
                 this.ancien.salaire = decom.salaire;
-                // this.droitIj1 = (this.ancien.prenatale+this.ancien.postnatale)*this.ancien.demisalaire
               }
             })
           }
@@ -289,8 +371,9 @@ export class UserProfileComponent implements OnInit {
     this.getAdresse(matricule)
   }
 
-  tecInfoIj1(ref){
-    this.traitSvc.prendInfoRecuParIdAcc(ref, this.idToken).subscribe(res =>{
+
+  tecInfoIj1(ref) {
+    this.traitSvc.prendInfoRecuParIdAcc(ref, this.idToken).subscribe(res => {
       if (res.status == 200) {
         this.tecIj1 = res.body
       }
@@ -347,7 +430,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   showModalAdresse() {
-   ;
+    ;
     $(this.ajputAdresse.nativeElement).modal('show');
   }
 
@@ -356,15 +439,16 @@ export class UserProfileComponent implements OnInit {
   }
 
   ajouterMP() {
-    this.dataMP = {
+    this.mpDmd = {
       id_individu: this.Dmd.champ.accueilMod.idIndividu,
       banque: this.mp.banque,
       agence: this.mp.agence,
       numero: this.mp.numero,
       numero_cmpt: this.mp.numero_cmpt,
-      id_mode_paiement: this.mp.type_mdp
+      id_mode_paiement: this.mp.type_mdp,
+      caisse: this.mp.caisse
     }
-    this.traitSvc.saveModepaie(this.dataMP, this.idToken).subscribe(res => {
+    this.traitSvc.saveModepaie(this.mpDmd, this.idToken).subscribe(res => {
       if (res.status == 200) {
         this.getModePayement(this.Dmd.champ.accueilMod.idIndividu);
         this.hideModalMP();
@@ -425,28 +509,51 @@ export class UserProfileComponent implements OnInit {
 
   ValideSaveDemande() {
     let MPDemande = {}
-    if (this.modePaie != null || this.checkEmpl != null) {
-      this.insererDemande()
-      MPDemande = {
-        modepaiement: this.modePaie.type_mdp,
-        agence: this.modePaie.agence,
-        banque: this.modePaie.banque,
-        numero_cmpt: this.modePaie.numero_cmpt
+    if (this.ij1.etat == 2) {
+      if (this.modePaie != null || this.checkEmpl != null) {
+        this.insererDemande()
+        MPDemande = {
+          modepaiement: this.modePaie.type_mdp,
+          agence: this.modePaie.agence,
+          banque: this.modePaie.banque,
+          numero_cmpt: this.modePaie.numero_cmpt
+        }
+        localStorage.setItem("modepaie", JSON.stringify(MPDemande))
       }
-      localStorage.setItem("modepaie", JSON.stringify(MPDemande))
+      else {
+        this.saveNoteRetour();
+      }
+    } else {
+      this.toastr.info("Votre ancien demande n'est pas encore validée , veuillez retsez en attente")
     }
-    else {
-      this.saveNoteRetour();
-    }
+  }
+  public onFileChanged(event) {
+    //Select File
+    this.selectedFile = event.target.files[0];
   }
 
   insererDemande() {
+    const formValue = this.ijForm.value;
+    let dateDepot;
+    const tecInfoNonRequis = this.ij2srvc.setValidFormDataForDynamicForms_toKeyArray(this.pieces);
+    tecInfoNonRequis.push('matrIndiv');
+    //  tecInfoNonRequis.push('empl');
+    const tecInfRec = this.ij2srvc.setTecInfRec(formValue, this.referenceDemandeIj, tecInfoNonRequis);
+
+    let tecPcsNonRequis = this.ij2srvc.setValidFormDataForDynamicForms_toKeyArray(this.inputs);
+    tecPcsNonRequis.push('matrIndiv');
+    let tecPcsRec = this.ij2srvc.setTecPcsRec(formValue, this.referenceDemandeIj, tecPcsNonRequis);
+
+    for (let i = 0; i < tecInfRec.length; i++) {
+      if (tecInfRec[i].idTypeInfo === '45') {
+        dateDepot = tecInfRec[i].valeur;
+        break;
+      }
+    }
+    //eto zao ambony
     let msg = {}
-    // this.piesy = [];
-    // for (let i = 0; i < this.piece.length; i++) {
-    //   const element = this.piece[i].nom;
-    //   this.piesy.push(element)
-    // }
+    const uploadImageData = new FormData();
+    uploadImageData.append('imageFile', this.selectedFile, this.selectedFile.name)
     msg = {
       accueilMod: {
         id_acc: this.referenceDemandeIj,
@@ -460,53 +567,76 @@ export class UserProfileComponent implements OnInit {
         observations: " Demande indemnité journalière 2 ème tranche"
       },
       tecInfoRecuMod: this.tecIj1,
-      infodmd:{
+      infodmd: {
         montantij1: this.ancien.salaire,
-        demisalaire:this.ancien.demisalaire,
-        nbrjrpost:this.ancien.nbjourpost,
-        nbjrpre:this.ancien.nbjourpre,
-        nationaliote:this.individu.nationalite,
-        sexe:this.individu.sexe,
-        dateDossier:this.ancien.date_dossier,
-        observations:this.ancien.observations,
-        droipost:this.ancien.postnatale,
-        droitpre:this.ancien.prenatale,
-        reference:this.referenceDemandeIj
-      }
+        demisalaire: this.ancien.demisalaire,
+        nbrjrpost: this.ancien.nbjourpost,
+        nbjrpre: this.ancien.nbjourpre,
+        nationaliote: this.individu.nationalite,
+        sexe: this.individu.sexe,
+        dateDossier: this.ancien.date_dossier,
+        observations: this.ancien.observations,
+        droipost: this.ancien.postnatale,
+        droitpre: this.ancien.prenatale,
+        reference: this.referenceDemandeIj
+      },
+      modepaietiers: {
+        id_mode_paiement: this.mp.type_mdp,
+        id_individu: this.indiv,
+        banque: this.modePaie.banque,
+        numero_cmpt: this.modePaie.numero_cmpt,
+        numero: this.modePaie.numero,
+        agence: this.modePaie.agence,
+        IdACc: this.referenceDemandeIj,
+        caisse: this.modePaie.caisse
+      },
+      tecPcsRecMod: tecPcsRec,
 
     };
-    
+
     this.traitSvc.saveDemande(msg, this.idToken).subscribe(res => {
       let dataSave = this.traitSvc.transformeWSReponse(res);
       if (dataSave.success) {
-        console.log("DONNEES DEMADE",  msg);
+        console.log("DONNEES DEMADE", msg);
         this.saveAccuse();
         localStorage.setItem("stock", JSON.stringify(msg));
         localStorage.getItem('user');
         localStorage.setItem("typeDemande", "Demande Indeminité Journalière deuxième tranche");
         const notifMessage = "Votre demande d'indemnité journalière deuxième tranche Réf-" + this.referenceDemandeIj + " a été enregistré mais en cours de traitement.";
         this.toastr.success(notifMessage);
-        const dateToday = this.datePipe.transform(new Date(Date.now()), 'yyyy-MM-dd');
-        const content = {
-          expediteur: this.user.id_acces,
-          destinataire: this.user.id_acces,
-          titre: "Demande d'indemnité journalière deuxieme tranche",
-          message: notifMessage,
-          typeNotif: '',
-          dateEnvoi: dateToday,
-          referenceNotif: this.referenceDemandeIj
-        };
-        // this.traitSvc.sendNotif(this.user.id_acces, content).then(() => {
-        //   this.toastr.success('Notification envoyé');
-        // }, (err) => {
-        //   this.toastr.warning('Notification non envoyé');
-        // }
-        // );
+        this.id_demande = this.referenceDemandeIj;
+        const Pcs = this.ij2srvc.getTecPcsForMongo(formValue, tecPcsNonRequis);
+        let fichiers = [];
+        for (let i = 0; i < Pcs.length; i++) {
+          if (Array.isArray(Pcs[i])) {
+            for (let j = 0; j < Pcs[i].length; j++) {
+              Pcs[i][j].serviceName = "Demande IJ2";
+              this.piecesAccuse.push(Pcs[i][j].name);
+              fichiers.push(Pcs[i][j]);
+            }
+          }
+        }
+        if (this.autrePieceValue.length > 0) {
+          for (let i = 0; i < this.autrePieceValue.length; i++) {
+            this.autrePieceValue[i].id_files = this.id_demande;
+            this.piecesAccuse.push(this.autrePieceValue[i].name);
+            fichiers.push(this.autrePieceValue[i]);
+          }
+        }
+        this.ij2srvc.saveFilesWS(fichiers).subscribe(data => {
+          if (data.status == 200) {
+            this.toastr.success('Fichier enregistré avec succes');
+          } else {
+            this.toastr.warning('Erreur d\'enregistrement du fichier');
+          }
+        });
+        localStorage.setItem("piecesAccuse", JSON.stringify(this.piecesAccuse));
+        const dateToday = this.datePipe.transform(new Date(Date.now()), 'yyyy-MM-dd')
         this.showModalAR();
       } else {
         this.toastr.error('error', 'Veuillez choisir un mode de paiement')
       }
-    })
+    });
   }
 
   public inputTyped(source: string, text: string) {
@@ -536,11 +666,11 @@ export class UserProfileComponent implements OnInit {
     }
   }
 
-  getAllMp(){
+  getAllMp() {
     this.typeMp = []
-    this.traitSvc.getAllMp(this.idToken).subscribe(res =>{
+    this.traitSvc.getAllMp(this.idToken).subscribe(res => {
       if (res.status == 200) {
-       this.typeMp = res.body
+        this.typeMp = res.body
       }
     })
   }
@@ -586,13 +716,112 @@ export class UserProfileComponent implements OnInit {
     });
   }
 
-  versNoteRetour(reference){
-    this.routes.navigate(['/accusereception/'+reference])
+  versNoteRetour(reference) {
+    this.routes.navigate(['/accusereception/' + reference])
   }
 
-  selectMp(index){
+  selectMp(index) {
     console.log(index.target.value);
     this.mp.type_mdp = index.target.value
   }
 
+  filtreChange(sur) {
+    if (sur == 'surNom') {
+      this.changeCritere();
+    }
+    else if (sur == 'surPrenom') {
+      this.changeCritere();
+    }
+    else if (sur == 'surDatenais') {
+      this.changeCritere();
+    }
+    else if (sur == 'surCin') {
+      this.changeCritere();
+    }
+  }
+  changeCritere() {
+    this.param.nom = this.param.nom,
+      this.param.prenoms = this.param.prenoms,
+      this.param.date_naissance = this.param.date_naissance,
+      this.param.cin = this.param.cin
+    this.prendListe();
+  }
+  prendListe() {
+    let msg={}
+    this.show = true;
+    msg={
+      param : this.param
+    }
+
+    this.ij2srvc.prendListeIndiv(msg, this.idToken).subscribe(data => {
+      if (data.status == 200) {
+        this.ListIndiv = data.body['result'];
+        this.page = data.body['page'];  
+        this.max = data.body['max'];
+        this.nbPage = data.body['nbPage'];
+        this.show = false;
+      }
+      else {
+        this.toastr.warning('Impossible de recupérer la liste des individus');
+        this.show = false;
+      }
+    }
+    );
+  }
+  //Manomboka eto
+  addinputfile() {
+    this.testNom.push(true);
+    this.autrePieces.push(1)
+  }
+
+  getName(event, indice) {
+    this.nomFichier[indice] = event.target.value;
+    if (this.nomFichier.length === 0 || this.nomFichier[indice] === "" || this.nomFichier[indice] === undefined || this.nomFichier[indice] === null) {
+      this.testNom[indice] = true;
+    }
+    else {
+      this.testNom[indice] = false;
+    }
+    console.log(this.nomFichier[indice]);
+  }
+
+  checkValue(value) {
+    var obj = {};
+    this.show = true;
+    if (!value.target.checked) {
+      this.prolongation = 1;
+      this.loadInputFile(this.prolongation);
+    }
+
+    else {
+      this.prolongation = 0;
+      this.loadInputFile(this.prolongation);
+    }
+    this.show = false;
+  }
+
+  loadInputFile(prol) {
+    const obj = {
+      "idtecdmd": "422",
+      "prolongation": prol
+    };
+    this.ij2srvc.getPiecesRequiseIj2WS(obj, this.idToken).subscribe(data => {
+      if (data.status == 200) {
+        const listForm = data.body;
+        this.pieces = this.ij2srvc.setValidFormDataForDynamicFormsPieces(listForm);
+        this.ijForm = this.ij2srvc.addControlToFormGroupPcs(this.ijForm, this.pieces);
+        //  this.show = true;
+      } else {
+        this.toastr.warning('Erreur: liste libellé requis Ij 2');
+      }
+    });
+
+  }
+
+  supprimerFichier(index) {
+    this.autrePieceValue.splice(index, 1);
+    this.autrePieces.splice(index, 1);
+  }
+
+  
 }

@@ -1,0 +1,26 @@
+<br><br><br><br><br><br>
+<div class="container row">
+    <div class="col-md-6">
+        <input type="file" class="btn btn-info" (change)="onFileChanged($event)">
+    </div>
+    <div class="col-md-6">
+        <input type="button" class="btn btn-info" (click)="onUpload()" value="upload">
+    </div>
+</div>
+<hr />
+<!-- <div class="container row">
+    <div class="col-md-6">
+        <input type="text" class="form-control" id="name" placeholder="image name" [(ngModel)]="imageName"
+            name="name" />
+    </div>
+    <div class="col-md-6">
+        <input type="button" (click)="getImage()" value="Get Image">
+    </div>
+</div> -->
+<div class="container row">
+    <div class="col-md-12">
+        <div *ngIf=retrievedImage>
+            <img [src]="retrievedImage">
+        </div>
+    </div>
+</div>

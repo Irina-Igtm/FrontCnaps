@@ -1,3 +1,4 @@
+import { OpIj2Component } from './../../op-ij2/op-ij2.component';
 import { DetailsIj2Component } from './../../details-ij2/details-ij2.component';
 import { AccuseReceptionComponent } from './../../accuse-reception/accuse-reception.component';
 import { AuthGuard } from './../../helper/auth.guard';
@@ -13,6 +14,7 @@ import { NotificationsComponent } from '../../notifications/notifications.compon
 import { UpgradeComponent } from '../../upgrade/upgrade.component';
 import { ListeIJ2Component } from '../../liste-ij2/liste-ij2.component';
 import { Role } from '../../models/role'
+import { UploadFilesComponent } from 'app/components/upload-files/upload-files.component';
 
 export const AdminLayoutRoutes: Routes = [
     // {
@@ -69,5 +71,6 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'accusereception/:reference', component: AccuseReceptionComponent, canActivate: [AuthGuard] },
     { path: 'listeij2', component: ListeIJ2Component, canActivate: [AuthGuard], data: { roles: [Role.bo, Role.admin, Role.user] } },
     { path: 'details-ij2/:id', component: DetailsIj2Component, canActivate: [AuthGuard] },
-
+    { path: 'upload', component: UploadFilesComponent, canActivate: [AuthGuard] },
+    { path: 'op-ij2', component: OpIj2Component, canActivate: [AuthGuard] },
 ];

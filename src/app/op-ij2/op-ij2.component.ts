@@ -6,10 +6,13 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./op-ij2.component.css']
 })
 export class OpIj2Component implements OnInit {
-
+  lienRetour = "ij2-pf"; 
+  enPDF = false;
+  
   constructor() { }
 
   ngOnInit(): void {
+    document.title = "OP - IJ2";
   }
 
 }

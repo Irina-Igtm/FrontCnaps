@@ -79,7 +79,7 @@ export class ListeIJ2Component implements OnInit {
     this.show = true;
     this.trtsrvc.prendListeDemandePF(this.filtre, this.idToken).subscribe(data => {
       if (data.status == 200) {
-        console.log("DATA"  , data.body['list']);
+        console.log("DATA"  , data.body);
         this.listDmdIj = data.body['list'];
         this.nbPage = data.body['totalPages'];
         this.show = false;

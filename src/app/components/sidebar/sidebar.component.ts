@@ -14,7 +14,7 @@ export const ROUTES: RouteInfo[] = [
     { path: '/listeij2', title: '.',  icon:'Liste', class: '' },
     // { path: '/typography', title: '.',  icon:'OP', class: '' },
     { path: '/icons', title: '.',  icon:'Validation', class: '' },
-    // { path: '/maps', title: '.',  icon:'Tresor', class: '' },
+    { path: '/upload', title: '.',  icon:'Upload', class: '' }
     // { path: '/upgrade', title: '',  icon:'unarchive', class: 'active-pro' },
 ];
 

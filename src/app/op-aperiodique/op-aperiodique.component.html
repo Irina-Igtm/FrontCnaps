@@ -1,0 +1,461 @@
+<ul *ngIf="!Export.enPDF" class="nav nav-tabs">
+  <li class="nav-item nav-cat">
+    <span class="nav-link" [ngClass]="{'active cat-active': categorie == 'OP'}" (click)="clickCategorie('OP')">Création
+      OP</span>
+  </li>
+  <!-- <li *ngIf="estDirecteur" class="nav-item nav-cat">
+      <span class="nav-link" [ngClass]="{'active cat-active': categorie == 'OPD'}" (click)="clickCategorie('OPD')">Création
+        OP (Directeur)</span>
+    </li> -->
+  <li class="nav-item nav-cat">
+    <span class="nav-link" [ngClass]="{'active cat-active': categorie == 'Liste'}"
+      (click)="clickCategorie('Liste')">Liste OP</span>
+  </li>
+  <li class="nav-item nav-cat">
+    <span class="nav-link" [ngClass]="{'active cat-active': categorie == 'Export'}"
+      (click)="clickCategorie('Export')">Export PDF</span>
+  </li>
+</ul>
+<br>
+
+<div class="row">
+
+  <!-- GENERATION/CREATION ORDRE DE PAIEMENT -->
+  <div *ngIf="categorie == 'OP'" class="col-12">
+    <div *ngIf="OP.chargeListe" class="loader"></div>
+    <div class="row">
+      <div class="col-6 form-group">
+        <label>Mode de paiement</label>
+        <select [(ngModel)]="OP.abrevMP" (change)="mpChange()" class="form-control custom-select">
+          <option *ngFor="let mp of OP.listeMP" value="{{mp.abreviation}}">{{mp.libelle}}</option>
+        </select>
+      </div>
+    </div>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Ref demande</th>
+          <th>Bénéficiaire</th>
+          <th>Nom Bénéf.</th>
+          <th>Prénoms Bénéf.</th>
+          <th>CIN Bénéf.</th>
+          <th>Montant</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let temp of OP.fileAttenteOP">
+          <td>{{temp.id_demande}}</td>
+          <td>{{temp.id_benef}}</td>
+          <td>{{temp.nomBenef}}</td>
+          <td>{{temp.prenomBenef}}</td>
+          <td>{{temp.cinBenef}}</td>
+          <td style="text-align: right;">{{temp.montant | number:'1.2-2':'fr'}}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td style="font-weight: bold;text-align: right;" colspan="4">Montant Total</td>
+          <td style="font-weight: bold;text-align: right;">{{OP.totalOP | number:'1.2-2':'fr'}}</td>
+        </tr>
+      </tfoot>
+    </table>
+    <label *ngIf="OP.fileAttenteOP.length > 0">Nombre de bénéficiaire: {{OP.fileAttenteOP.length}}</label>
+    <div *ngIf="OP.fileAttente != null" style="width: 100%; text-align: center;">
+      <button *ngIf="OP.fileAttenteOP.length > 0 && !OP.charge"
+        (click)="creerArgumentOp()" class="btn btn-success">Générer l'Ordre de Paiement pour le mode de paiement: <strong>{{OP.mpChoisi.libelle}}</strong></button>
+      <div *ngIf="OP.charge" class="loader"></div>
+    </div>
+    <br>
+  </div>
+
+  <!-- GENERATION/CREATION ORDRE DE PAIEMENT (DIRECTEUR) -->
+  <div *ngIf="categorie == 'OPD'" class="col-12">
+      <div *ngIf="OPD.chargeListe" class="loader"></div>
+      <div class="row">
+        <div class="col-6 form-group">
+          <label>Mode de paiement</label>
+          <select [(ngModel)]="OPD.abrevMP" (change)="mpChangeD()" class="form-control custom-select">
+            <option *ngFor="let mp of OP.listeMP" value="{{mp.abreviation}}">{{mp.libelle}}</option>
+          </select>
+        </div>
+      </div>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Ref demande</th>
+            <th>Bénéficiaire</th>
+            <th>Nom Bénéf.</th>
+            <th>Prénoms Bénéf.</th>
+            <th>CIN Bénéf.</th>
+            <th>Montant</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let temp of OPD.fileAttenteOP; let i = index">
+            <td>{{temp.tecop.tecbenef[0].id_demande}}</td>
+            <td>{{temp.tecop.tecbenef[0].id_benef}}</td>
+            <td>{{temp.nomBenef}}</td>
+            <td>{{temp.prenomBenef}}</td>
+            <td>{{temp.cinBenef}}</td>
+            <td style="text-align: right;">{{temp.tecop.tecbenef[0].montant | number:'1.2-2':'fr'}}</td>
+            <td>
+              <button *ngIf="!OPD.charge" (click)="creerArgumentOpD(i)" class="btn btn-success">Générer</button>
+              <div *ngIf="OPD.charge" class="mini-loader"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+    </div>
+
+  <!-- LISTE/DETAIL ORDRE DE PAIEMENT -->
+  <div *ngIf="categorie == 'Liste'" class="col-12">
+    <div class="row">
+      <div class="col-6 form-group">
+        <label>Date</label>
+        <input [(ngModel)]="Liste.filtre.op" (ngModelChange)="filtreChange()" type="date" class="form-control">
+      </div>
+      <div class="col-6 form-group">
+        <label>Etat</label>
+        <select [(ngModel)]="Liste.filtre.flagvalide" (ngModelChange)="filtreChange()"
+          class="form-control custom-select">
+          <option value="O">Créé</option>
+          <option value="R">Réglé</option>
+          <option value="N">Annulé</option>
+        </select>
+      </div>
+    </div>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Num OP</th>
+          <th>Montant</th>
+          <th>Date Création</th>
+          <th>Etat</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let op of Liste.liste">
+          <td>{{op.id_op}}</td>
+          <td>{{op.montant | number}}</td>
+          <td>{{op.date_op | date:'dd/MM/yyyy'}}</td>
+          <td>{{Liste.etat[op.flag_valide]}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="Liste.charge" class="loader"></div>
+  </div>
+
+  <!-- EXPORT/IMPRESSION PDF ORDRE DE PAIEMENT -->
+  <div *ngIf="categorie == 'Export'" class="col-12">
+    <div *ngIf="!Export.enPDF" style="width: 100%;">
+      <div style="width: 300px; text-align: center; margin: 0 auto;">
+        <label>Num OP</label>
+        <input [(ngModel)]="Export.idOp" (ngModelChange)="opChange()" type="text" class="form-control"
+          style="width: 300px; text-align: center">
+      </div>
+    </div>
+    <br>
+    <br>
+    <div>
+      <div style="width: 100%;font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif !important;">
+        <div *ngIf="Export.enPDF"><br><br></div>
+        <div style="width: 100%; text-align: center; margin-bottom: 55px;">
+          <h1><u style="text-decoration: none; border-bottom: 3px solid black;">ORDRE DE PAIEMENT</u></h1>
+        </div>
+        <table style="width: 100%;margin-bottom: 10px;margin-top: 10px;">
+          <tr>
+            <td>
+              <label>N°&nbsp;&nbsp;</label><strong>{{Export.idOp}}</strong>
+            </td>
+            <td style="text-align: right;padding-right: 40px;">
+              {{Export.libelleDate}}</td>
+          </tr>
+        </table>
+        <table style="border-collapse: collapse;margin-bottom: 1px;width: 100%;">
+          <tbody>
+            <tr>
+              <td style="border: 1px solid lightgray;padding: 15px;">
+                <p>Par imputation du compte : {{Export.libelleCompte}}</p>
+                <div style="display: flex; flex-wrap: wrap;">
+                  <div style="width: 100%;flex: 0 0 50%;max-width: 50%;position: relative;text-align: right;">
+                    <span>N°&nbsp;&nbsp;</span><u>&nbsp;&nbsp;&nbsp;&nbsp;{{idRubrique}}&nbsp;&nbsp;&nbsp;&nbsp;</u>
+                  </div>
+                  <!-- <div style="width: 100%;flex: 0 0 50%;max-width: 50%;position: relative;text-align: center;">N°
+                    dossier :&nbsp;&nbsp;</div> -->
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table style="border-collapse: collapse;margin-bottom: 1px;width: 100%;">
+          <tr>
+            <td style="border: 1px solid lightgray;padding: 15px;padding-bottom: 40px;">
+              <p>Veuillez payer la somme de</p>
+              <p style="text-transform: uppercase;">{{Export.montantLettre+" Ariary"}}</p>
+            </td>
+            <td style="border: 1px solid lightgray;max-width: 400px;padding-left: 15px;">
+              <p>Nombre de bénéficiaires :</p>
+              <div style="display: flex; flex-wrap: wrap;">
+                <div style="width: 100%;flex: 0 0 50%;max-width: 50%;position: relative;">Individu :</div>
+                <div style="width: 100%;flex: 0 0 50%;max-width: 50%;position: relative;text-align: center;">
+                  {{Export.nombreBenef | number}}</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid lightgray;">
+              <span
+                style="font-size: 18pt;float: left; margin-top: -25px; padding: 5px; background-color: white;">BENEFICIAIRES</span>
+              <div style="width: 100%;">
+                <div style="width: 100%; text-align: center;">
+                  <h1><strong>{{texteBenef}}</strong></h1>
+                </div>
+              </div>
+              <div style="width: 100%;height: 60px;"></div>
+            </td>
+            <td style="border: 1px solid lightgray;vertical-align: bottom;">
+              <div style="width: 100%;height: 60px;"></div>
+              <div
+                style="display: flex;flex-wrap: wrap;font-size: 18pt; font-weight: bold;padding-bottom: 10px;padding-left: 10px;padding-right: 10px;">
+                <div style="width: 100%;flex: 0 0 40%;position: relative;">B.P. Ar</div>
+                <div style="width: 100%;flex: 0 0 60%;position: relative;text-align: right;">
+                  {{Export.montant | number}}</div>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <table style="width: 100%;border-collapse: collapse;">
+          <tr>
+            <td style="border: 1px solid lightgray;height: 85px;"></td>
+          </tr>
+        </table>
+        <br>
+        <div style="display: flex;flex-wrap: wrap;">
+          <div style="width: 100%;flex: 0 0 50%;position: relative;"></div>
+          <div style="width: 100%;flex: 0 0 50%;position: relative;text-align: center;">A __________________, le
+            _________</div>
+          <div style="width: 100%;flex: 0 0 50%;position: relative;"></div>
+          <div style="width: 100%;flex: 0 0 50%;position: relative;text-align: center;">L'ordonnateur,</div>
+        </div>
+        <br>
+        <br>
+        <label>OBSERVATIONS</label>
+        <table style="width: 100%;border-collapse: collapse;margin-top: 15px;">
+          <thead>
+            <tr style="text-transform: uppercase;">
+              <td style="border: 1px solid lightgray;padding: 10px;">Demande</td>
+              <td style="border: 1px solid lightgray;padding: 10px;">Bénéficiaire</td>
+              <td style="border: 1px solid lightgray;padding: 10px;">PAYé LE</td>
+              <td style="border: 1px solid lightgray;padding: 10px;">PAR</td>
+              <td style="border: 1px solid lightgray;padding: 10px;">TITRE</td>
+              <td style="border: 1px solid lightgray;padding: 10px;">MONTANT</td>
+              <td style="border: 1px solid lightgray;padding: 10px;">CRéDIT</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let s of Export.listeSouche">
+              <td style="border: 1px solid lightgray;padding: 10px;" (click)="affichePieces(s.idAcc)" class="ligne-clickable" data-toggle="modal" data-target="#modalListePiece">{{s.idAcc}}</td>
+              <td style="border: 1px solid lightgray;padding: 10px;">{{s.idBenef}}</td>
+              <td style="border: 1px solid lightgray;padding: 10px;">{{s.dateEdition | date:'dd/MM/yyyy'}}</td>
+              <td style="border: 1px solid lightgray;padding: 10px;">{{s.abrevMP}}</td>
+              <td style="border: 1px solid lightgray;padding: 10px;">{{s.idTitre}}</td>
+              <td style="border: 1px solid lightgray;padding: 10px;">{{s.montant | number}}</td>
+              <td style="border: 1px solid lightgray;padding: 10px;">{{s.compte}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <br>
+        <div style="display: flex;flex-wrap: wrap;">
+          <div style="width: 100%;flex: 0 0 50%;position: relative;"></div>
+          <div style="width: 100%;flex: 0 0 50%;position: relative;text-align: center;">VISA</div>
+          <div style="width: 100%;flex: 0 0 50%;position: relative;"></div>
+          <div style="width: 100%;flex: 0 0 50%;position: relative;text-align: center;">A __________________, le
+            _________</div>
+          <div style="width: 100%;flex: 0 0 50%;position: relative;"></div>
+          <div style="width: 100%;flex: 0 0 50%;position: relative;text-align: center;">L'agent comptable,</div>
+        </div>
+      </div>
+    </div>
+    <div id="btn-apercu" style="display: none;">
+      <div style="text-align: right;padding-right: 50px;width: 100%;">
+        <button onclick="this.style.display='none';window.print();this.style.display='block';"
+          style="cursor: pointer;font-size: 13pt;background-color: #28a745;border-color: #28a745;color: #fff;border-radius: .25rem;margin: auto;padding-top: 10px;padding-bottom: 10px;padding-left: 20px;padding-right: 20px;">Imprimer</button>
+      </div>
+    </div>
+    <br>
+    <div *ngIf="!Export.enPDF" style="width: 100%; text-align: right; margin-right: 100px; margin-bottom: 30px;">
+      <button (click)="apercu()" class="btn btn-success">Aperçu</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL CHOIX PROJET -->
+<!-- <div #modalChoixProjet class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title">Complétion des informations</h6>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Code Projet</label>
+          <select [(ngModel)]="codeProjet" class="form-control custom-select">
+            <option *ngFor="let p of OP.listeProjet" value="{{p.codeProjet}}">{{p.codeProjet +" - "+ p.libelleProjet}}
+            </option>
+          </select>
+        </div>
+        <div *ngIf="OP.doitAfficheBenef" class="form-group">
+          <label>Compte Tier Projet</label>
+          <select [(ngModel)]="compteBenef" class="form-control custom-select">
+            <option *ngFor="let b of OP.listeBenef" value="{{b.pmtiers}}">{{b.pmcode +" - "+ b.pmlibp}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a [routerLink]="['/' + lienRetour]" data-dismiss="modal" class="btn">Annuler</a>
+        <button (click)="validerCodeProjet()" type="button" class="btn btn-primary">Ajouter</button>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<!-- MODAL DETAIL PIECE -->
+<!-- <div id="modalListePiece" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">REFERENCE {{DetailPiece.reference}}</h4>
+      </div>
+      <div class="modal-body">
+        <h4>PIECES</h4>
+        <hr>
+        <ul>
+          <li *ngFor="let p of DetailPiece.liste" (click)="ouvrirFichier(p)" class="fichier">{{p.name}}</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button data-dismiss="modal" class="btn">Annuler</button>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<div id="divPourPDF-OP" style="display: none;">
+  <div style="width: 100%;font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif !important;">
+    <div *ngIf="Export.enPDF"><br><br></div>
+    <div style="width: 100%; text-align: center; margin-bottom: 55px;">
+      <h1><u style="text-decoration: none; border-bottom: 3px solid black;">ORDRE DE PAIEMENT</u></h1>
+    </div>
+    <table style="width: 100%;margin-bottom: 10px;margin-top: 10px;">
+      <tr>
+        <td>
+          <label>N°&nbsp;&nbsp;</label><strong>{{Export.idOp}}</strong>
+        </td>
+        <td style="text-align: right;padding-right: 40px;">
+          {{Export.libelleDate}}</td>
+      </tr>
+    </table>
+    <table style="border-collapse: collapse;margin-bottom: 1px;width: 100%;">
+      <tbody>
+        <tr>
+          <td style="border: 1px solid lightgray;padding: 15px;">
+            <p>Par imputation du compte : {{Export.libelleCompte}}</p>
+            <div style="display: flex; flex-wrap: wrap;">
+              <div style="width: 100%;flex: 0 0 50%;max-width: 50%;position: relative;text-align: right;">
+                <span>N°&nbsp;&nbsp;</span><u>&nbsp;&nbsp;&nbsp;&nbsp;{{idRubrique}}&nbsp;&nbsp;&nbsp;&nbsp;</u>
+              </div>
+              <!-- <div style="width: 100%;flex: 0 0 50%;max-width: 50%;position: relative;text-align: center;">N°
+                dossier :&nbsp;&nbsp;</div> -->
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table style="border-collapse: collapse;margin-bottom: 1px;width: 100%;">
+      <tr>
+        <td style="border: 1px solid lightgray;padding: 15px;padding-bottom: 40px;">
+          <p>Veuillez payer la somme de</p>
+          <p style="text-transform: uppercase;">{{Export.montantLettre+" Ariary"}}</p>
+        </td>
+        <td style="border: 1px solid lightgray;max-width: 400px;padding-left: 15px;">
+          <p>Nombre de bénéficiaires :</p>
+          <div style="display: flex; flex-wrap: wrap;">
+            <div style="width: 100%;flex: 0 0 50%;max-width: 50%;position: relative;">Individu :</div>
+            <div style="width: 100%;flex: 0 0 50%;max-width: 50%;position: relative;text-align: center;">
+              {{Export.nombreBenef | number}}</div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid lightgray;">
+          <span
+            style="font-size: 18pt;float: left; margin-top: -25px; padding: 5px; background-color: white;">BENEFICIAIRES</span>
+          <div style="width: 100%;">
+            <div style="width: 100%; text-align: center;">
+              <h1><strong>{{texteBenef}}</strong></h1>
+            </div>
+          </div>
+          <div style="width: 100%;height: 60px;"></div>
+        </td>
+        <td style="border: 1px solid lightgray;vertical-align: bottom;">
+          <div style="width: 100%;height: 60px;"></div>
+          <div
+            style="display: flex;flex-wrap: wrap;font-size: 18pt; font-weight: bold;padding-bottom: 10px;padding-left: 10px;padding-right: 10px;">
+            <div style="width: 100%;flex: 0 0 40%;position: relative;">B.P. Ar</div>
+            <div style="width: 100%;flex: 0 0 60%;position: relative;text-align: right;">
+              {{Export.montant | number}}</div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table style="width: 100%;border-collapse: collapse;">
+      <tr>
+        <td style="border: 1px solid lightgray;height: 85px;"></td>
+      </tr>
+    </table>
+    <br>
+    <div style="display: flex;flex-wrap: wrap;">
+      <div style="width: 100%;flex: 0 0 50%;position: relative;"></div>
+      <div style="width: 100%;flex: 0 0 50%;position: relative;text-align: center;">A __________________, le
+        _________</div>
+      <div style="width: 100%;flex: 0 0 50%;position: relative;"></div>
+      <div style="width: 100%;flex: 0 0 50%;position: relative;text-align: center;">L'ordonnateur,</div>
+    </div>
+    <br>
+    <br>
+    <label>OBSERVATIONS</label>
+    <table style="width: 100%;border-collapse: collapse;margin-top: 15px;">
+      <thead>
+        <tr style="text-transform: uppercase;">
+          <td style="border: 1px solid lightgray;padding: 10px;">PAYé LE</td>
+          <td style="border: 1px solid lightgray;padding: 10px;">PAR</td>
+          <td style="border: 1px solid lightgray;padding: 10px;">TITRE</td>
+          <td style="border: 1px solid lightgray;padding: 10px;">MONTANT</td>
+          <td style="border: 1px solid lightgray;padding: 10px;">CRéDIT</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let souche of listeSoucheExport">
+          <td style="border: 1px solid lightgray;padding: 10px;">{{souche.dateEdition | date:'dd/MM/yyyy'}}</td>
+          <td style="border: 1px solid lightgray;padding: 10px;">{{souche.abrevMP}}</td>
+          <td style="border: 1px solid lightgray;padding: 10px;">{{souche.idTitre}}</td>
+          <td style="border: 1px solid lightgray;padding: 10px;">{{souche.montant | number}}</td>
+          <td style="border: 1px solid lightgray;padding: 10px;">{{souche.compte}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <div style="display: flex;flex-wrap: wrap;">
+      <div style="width: 100%;flex: 0 0 50%;position: relative;"></div>
+      <div style="width: 100%;flex: 0 0 50%;position: relative;text-align: center;">VISA</div>
+      <div style="width: 100%;flex: 0 0 50%;position: relative;"></div>
+      <div style="width: 100%;flex: 0 0 50%;position: relative;text-align: center;">A __________________, le
+        _________</div>
+      <div style="width: 100%;flex: 0 0 50%;position: relative;"></div>
+      <div style="width: 100%;flex: 0 0 50%;position: relative;text-align: center;">L'agent comptable,</div>
+    </div>
+  </div>
+</div>

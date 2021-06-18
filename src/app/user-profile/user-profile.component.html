@@ -15,8 +15,15 @@
               <div class="row">
                 <div class="col-md-12">
                   <mat-form-field class="example-full-width">
-                    <input matInput placeholder="Matricule" type="text" (keyup.enter)="valideMatricule($event)">
+                    <input matInput placeholder="Matricule" type="text" (keyup.enter)="valideMatricule($event)"
+                      formControlName="matrIndiv">
                   </mat-form-field>
+                </div>
+                <div class="col-sm-3">
+                  <button type="button" class="btn btn-info btn-block" data-toggle="modal"
+                    data-target=".bd-example-modal-lg">
+                    Recherche Avancée
+                  </button>
                 </div>
 
               </div>
@@ -285,16 +292,18 @@
                 <table class="table table-hover table-sm">
                   <thead>
                     <th style="size: 5%;"></th>
-                    <th>Type </th>
                     <th>Banque</th>
                     <th>Agence</th>
+                    <th>Numero telephone</th>
+                    <th>Caisse</th>
                   </thead>
                   <tbody>
                     <tr *ngFor="let mp of listeMP">
                       <td><input type="radio" (change)="modePaiementChange(mp)"></td>
-                      <td>{{mp.type_mdp}}</td>
                       <td>{{mp.banque}}</td>
                       <td>{{mp.agence}}</td>
+                      <td>{{mp.numero}}</td>
+                      <td>{{mp.caisse}}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -392,18 +401,78 @@
                   </mat-form-field>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-md-12">
-                  <input placeholder="Pieces justificatives--" class="form-control" required type="file">
+
+              <!-- <div class="card">
+                <div class="card-header card-header-info">
+                  <h4 class="card-title" style="text-align: center;">Pièces justificatives</h4>
+                </div>
+                <div class="card-body">
+                <div class="col-md-10">
+                    <input type="file" class="btn btn-block" (change)="onFileChanged($event)">
                 </div>
               </div>
+            </div> -->
+
+              <div class="col-sm-12">
+                <div class="card">
+                  <br><br>
+                  <div class="card-body">
+                    <fieldset class="col-md-11">
+                      <legend><i class="fa fa-paperclip" aria-hidden="true"></i> PIECE(S) JUSTIFICATIVE(S)</legend>
+                      <div class="panel">
+                        <div class="panel-body">
+                          <div class="col-sm-12 border-haut" style="margin-top: 12px">
+                            <input type="checkbox" class="form-control" (change)="checkValue($event)">
+                            Prolongement<br>
+                          </div>
+                          <!-- <div>
+                          <div class="col-sm-12" *ngFor="let piece of pieces">
+                            <app-dynamic-pieces [pieces]="piece" [form]="ijForm" [idfiles]="referenceDemandeIj">
+                            </app-dynamic-pieces>
+                            <br>
+                          </div>
+                        </div> -->
+                          <div class="col-sm-12">
+                            <button class="btn btn-success" type="button" (click)="addinputfile()"> <i
+                                class="fa fa-plus"></i>
+                              Ajouter une autre pièce
+                            </button>
+                          </div>
+                          <br>
+                          <div class="row">
+                            <ng-container *ngFor="let piecesTransfert of autrePieces; index as indice">
+                              <div class="col-sm-5">
+                                <br>
+                                <input type="text" placeholder="Nom de la pièce" (keyup)="getName($event,indice)"
+                                  class="form-control">
+                                <input type="file" *ngIf="testNom[indice]" class="form-control"
+                                  (change)="onFileChange($event, indice)" [(ngModel)]="piecesTransfert.value" disabled>
+                                <input type="file" *ngIf="!testNom[indice]" class="form-control"
+                                  (change)="onFileChange($event, indice)" [(ngModel)]="piecesTransfert.value">
 
 
+                                <button class="btn btn-appro" style="width:20px;" type="button"
+                                  (click)="supprimerFichier(indice)" style="color: white" mat-button>supprimer</button>
+
+                                <br>
+                              </div>
+                            </ng-container>
+                          </div>
+                        </div>
+                      </div>
+                    </fieldset>
+                    <div class="clearfix"></div>
+                  </div>
+
+                </div>
+                <br>
+              </div>
+              <!-- Valider demande et l'enregistrer -->
               <div class="row" *ngIf="showIj1">
                 <div class="loader2"></div>
               </div>
-              <button mat-raised-button type="submit" class="btn btn-success pull-right"
-                (click)="ValideSaveDemande()">Enregistrer</button>
+              <button mat-raised-button type="submit" class="btn btn-success pull-right" (click)="ValideSaveDemande()"
+                [formGroup]="ijForm">Enregistrer</button>
               <div class="clearfix"></div>
             </form>
           </div>
@@ -568,7 +637,7 @@
           <div class="col-12 form-group">
             <div class="col-md-6">
               <!-- <ngx-select placeholder="Type" (select)="selectMp($event)" [items]="TypeMp" [(ngModel)]="mp.type_mdp"></ngx-select> -->
-              <select name="mp" id="mp" class="form-control" (click)="selectMp($event)" [(ngModel)]="mp.type_mdp" >
+              <select name="mp" id="mp" class="form-control" (click)="selectMp($event)" [(ngModel)]="mp.type_mdp">
                 <option *ngFor="let mp of typeMp" value={{mp.id_mode_paiement}}>{{mp.libelle}}</option>
               </select>
             </div>
@@ -580,6 +649,14 @@
               </mat-form-field>
             </div>
           </div>
+          <div class="col-10 form-group" *ngIf="mp.type_mdp == '4'">
+            <div class="col-md-4">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Caisse" type="text" [(ngModel)]="mp.caisse" required>
+              </mat-form-field>
+            </div>
+          </div>
+
           <div class="col-12 form-group" *ngIf="mp.type_mdp == '1'">
             <div class="col-md-4">
               <mat-form-field class="example-full-width">
@@ -614,6 +691,82 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <br>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">RECHERCHE AVANCEE</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-4 form-group">
+            <!--<label>Nom</label>-->
+            <input class="form-control" (keyup)="filtreChange('surNom')" placeholder="Nom"
+              [(ngModel)]="param.nom">
+
+          </div>
+          <div class="col-4 form-group">
+            <!--<label>Prénom</label>-->
+            <input class="form-control" (keyup)="filtreChange('surPrenom')" placeholder="Prénom"
+              [(ngModel)]="param.prenoms">
+          </div>
+          <div class="col-3 form-group">
+            <!--<label>Date de naissance</label>-->
+            <input type="date" class="form-control" (keyup.enter)="filtreChange('surDatenais')"
+              [(ngModel)]="param.date_naissance">
+          </div>
+          <div class="col-3 form-group">
+            <!--<label>CIN</label>-->
+            <input type="text" class="form-control" (keyup.enter)="filtreChange('surCin')" placeholder="Num CIN"
+              [(ngModel)]="param.cin">
+          </div>
+          <!-- <div class="col-1 form-group">
+            <button class="btn btn-info" (click)="onClickRecherche('I')"><span class="fa fa-search"></span></button>
+          </div> -->
+        </div>
+        <br>
+      </div>
+      <div class="card-body">
+        <div *ngIf="!show" class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <td>Matricule</td>
+                <td>Nom et Prénom</td>
+                <td>CIN</td>
+                <td>Date de naissance</td>
+                <td>Sexe</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let indiv of ListIndiv; let index = index">
+                <td>{{indiv.id_individu}}</td>
+                <td>{{indiv.nom}} {{indiv.prenoms}} </td>
+                <td>{{indiv.cin}}</td>
+                <td>{{indiv.date_naissance | date:'dd/MM/yyyy'}}</td>
+                <td>{{indiv.id_sexe.libelle}} </td>
+              </tr>
+            </tbody>
+          </table>
+          <nav aria-label="Page navigation example">
+            <ngb-pagination class="d-flex justify-content-center" [pageSize]="max" [collectionSize]="max * nbPage"
+              [(page)]="page" aria-label="asdf" [boundaryLinks]="true" [rotate]="true" [maxSize]="10"
+              (pageChange)="changeValue($event)"></ngb-pagination>
+          </nav>
+        </div>
+        <div *ngIf="show" style="margin: auto">
+          <div class="loader" style="margin: auto"></div>
         </div>
       </div>
       <br>

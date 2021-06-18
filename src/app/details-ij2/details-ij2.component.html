@@ -130,10 +130,56 @@
                                             </div>
                                             <div class="col-sm-4"></div>
                                             <div class="col-sm-4">
-                                                <app-modif-info-recu-pf
-                                                    *ngIf="idDmdIJ && etat && etat.id_type_etat !== 3"
-                                                    [referenceDmd]="idDmdIJ" (modifTermine)="modifTermine($event)">
-                                                </app-modif-info-recu-pf>
+                                                <!-- <div class="row">
+                                                    <div class="col-12">
+                                                        <button data-toggle="modal" data-target="#modalModifInfoRecu"
+                                                            class="btn btn-info">Modifier les informations
+                                                            reçues</button>
+                                                    </div>
+                                                </div> -->
+
+                                                <!-- <div id="modalModifInfoRecu" class="modal fade" data-backdrop="static"
+                                                    data-keyboard="false" tabindex="-1" role="dialog">
+                                                    <div class="modal-dialog modal-lg" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h6 class="modal-title">Modification des informations
+                                                                    reçus</h6>
+                                                                <button type="button" class="close"
+                                                                    data-dismiss="modal">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div *ngIf="listeChamps" class="modal-body">
+                                                                <div *ngFor="let champ of listeChamps; let indice = index"
+                                                                    class="form-group">
+                                                                    <label
+                                                                        class="texte-content">{{champ.refAccInfoTypMod.libelle_info}}</label>
+                                                                    <input
+                                                                        *ngIf="champ.refAccInfoTypMod.type_champ == 'D'"
+                                                                        [(ngModel)]="listeChamps[indice].valeur"
+                                                                        type="date" class="form-control">
+                                                                    <input
+                                                                        *ngIf="champ.refAccInfoTypMod.type_champ == 'C'"
+                                                                        [(ngModel)]="listeChamps[indice].valeur"
+                                                                        type="text" class="form-control">
+                                                                    <input
+                                                                        *ngIf="champ.refAccInfoTypMod.type_champ == 'N'"
+                                                                        [(ngModel)]="listeChamps[indice].valeur"
+                                                                        type="number" class="form-control">
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <div *ngIf="enCours" class="loader"></div>
+                                                                <button *ngIf="!enCours" (click)="validerModification()"
+                                                                    type="button"
+                                                                    class="btn btn-primary">Modifier</button>
+                                                                <button id="btn-fermer-modif-pf" data-dismiss="modal"
+                                                                    style="display: none;"></button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> -->
                                                 <!--<button *ngIf="cant_validate==true" type="submit"
                           class="btn btn-success btn-block">Modifier</button>-->
                                             </div>
@@ -399,7 +445,7 @@
                                     <br>
                                     <div class="col-md-3">
                                         <button data-toggle="modal" data-target="#decompte" class="btn"
-                                            style="width:100%;color: white;background: #8a21d3">Décompte</button>
+                                            style="width:100%;color: rgb(77, 42, 42);background: #8a21d3">Décompte</button>
                                     </div>
                                 </fieldset>
 
@@ -479,48 +525,48 @@
 
             <!-- INFO INDIVIDU -->
             <div class="tab-pane fade" id="infoIndiv">
-                <div *ngIf="info_indiv">
+                <div *ngIf="individu">
                     <div *ngIf="individu" class="row">
                         <div class="col-6 form-group">
-                          <label class="control-label texte-content">Nom</label>
-                          <label class="form-control">{{individu.nom}}</label>
+                            <label class="control-label texte-content">Nom</label>
+                            <label class="form-control">{{individu.nom}}</label>
                         </div>
                         <div class="col-6 form-group">
-                          <label class="control-label texte-content">Prénom</label>
-                          <label class="form-control">{{individu.prenoms}}</label>
+                            <label class="control-label texte-content">Prénom</label>
+                            <label class="form-control">{{individu.prenoms}}</label>
                         </div>
                         <div class="col-6">
-                          <label class="control-label texte-content">Matricule</label>
-                          <label class="form-control">{{individu.id_individu}}</label>
-                        </div>
-                        <div *ngIf="Individu.id_sexe" class="col-6">
-                          <label class="control-label texte-content">Sexe</label>
-                          <label class="form-control">{{individu.id_sexe.libelle}}</label>
+                            <label class="control-label texte-content">Matricule</label>
+                            <label class="form-control">{{individu.id_individu}}</label>
                         </div>
                         <div class="col-6">
-                          <label class="control-label texte-content">Date de naissance</label>
-                          <label class="form-control">{{individu.date_naissance | date:'dd/MM/yyyy'}}</label>
+                            <label class="control-label texte-content">Sexe</label>
+                            <label class="form-control">{{individu.id_sexe.libelle}}</label>
                         </div>
                         <div class="col-6">
-                          <label class="control-label texte-content">Lieu de naissance:</label>
-                          <label class="form-control">{{individu.lieu_naissance}}</label>
+                            <label class="control-label texte-content">Date de naissance</label>
+                            <label class="form-control">{{individu.date_naissance | date:'dd/MM/yyyy'}}</label>
                         </div>
                         <div class="col-6">
-                          <label class="control-label texte-content">CIN</label>
-                          <label class="form-control">{{individu.cin}}</label>
+                            <label class="control-label texte-content">Lieu de naissance:</label>
+                            <label class="form-control">{{individu.lieu_naissance}}</label>
+                        </div>
+                        <div class="col-6">
+                            <label class="control-label texte-content">CIN</label>
+                            <label class="form-control">{{individu.cin}}</label>
                         </div>
                         <div class="col-6 form-group">
-                          <label class="control-label texte-content">Date CIN</label>
-                          <label class="form-control">{{individu.date_cin | date:'dd/MM/yyyy'}}</label>
+                            <label class="control-label texte-content">Date CIN</label>
+                            <label class="form-control">{{individu.date_cin | date:'dd/MM/yyyy'}}</label>
                         </div>
-                        <div *ngIf="Individu.id_nationalite" class="col-6 form-group">
-                          <label class="control-label texte-content">Nationalité</label>
-                          <label class="form-control">{{individu.id_nationalite.libelle}}</label>
+                        <div class="col-6 form-group">
+                            <label class="control-label texte-content">Nationalité</label>
+                            <label class="form-control">{{individu.id_nationalite.libelle}}</label>
                         </div>
                         <!-- <div class="col-12" style="text-align: right;">
                           <button (click)="voirCIT()" class="btn btn-success">Voir CIT</button>
                         </div> -->
-                      </div>
+                    </div>
                 </div>
                 <br>
                 <!-- <app-choix-benef *ngIf="individu && dmdIJ" [demandeur]="individu.id_individu"
@@ -553,56 +599,158 @@
 
             <!-- INFO EMPLOYEUR -->
             <div class="tab-pane fade" id="infoEmpl">
-                <br>
-                <app-details-employeurs *ngIf="id_employeur!= null" [idIndividu]="id_indiv"
-                    [idEmplChoisi]="id_employeur">
-                </app-details-employeurs>
+                <div *ngIf="ListeEmployeur && ListeEmployeur.length > 0" class="row">
+                    <div class="col-12 form-group">
+                        <div class="row">
+                            <div class="col-1" style="text-align: right;">
+                                <h4 *ngIf="indice > 0" style="cursor: pointer;"><span (click)="change(-1)"><button
+                                            type="button" class="btn btn-primary"><i class="fas fa-arrow-left"></i>
+                                            Précédent </button> </span></h4>
+                            </div>
+                            <div class="col-10" style="text-align: center;">
+                                <h4>{{ListeEmployeur[indice].sig.id_empl.employeur_nom}} <span
+                                        *ngIf="ListeEmployeur[indice].sig.id_empl.id_empl == idEmplChoisi">(Actuel)</span>
+                                </h4>
+                            </div>
+                            <div class="col-1">
+                                <h4 *ngIf="indice < (ListeEmployeur.length-1)" style="cursor: pointer;"><span
+                                        (click)="change(1)">
+                                        <button type="button" class="btn btn-success">Suivant <i
+                                                class="fas fa-arrow-right"></i></button>
+                                    </span></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="col-6 form-group">
+                    <label class="control-label texte-content">Matricule (Nouveau)</label>
+                    <label class="form-control">{{ListeEmployeur[indice].sig.id_empl.id_empl}}</label>
+                </div> -->
+                    <div class="col-6 form-group">
+                        <label class="control-label texte-content">Matricule (Ancien)</label>
+                        <label class="form-control">{{ListeEmployeur[indice].sig.id_empl.employeur_matricule}}</label>
+                    </div>
+                    <!-- <div class="col-12 form-group">
+                    <label class="control-label texte-content">Sigle code</label>
+                    <label class="form-control">{{ListeEmployeur[indice].sig.id_empl.sigle_code}}</label>
+                </div> -->
+                    <div class="col-12 form-group">
+                        <label class="control-label texte-content">Activité</label>
+                        <label class="form-control">{{ListeEmployeur[indice].sig.id_empl.id_activite.libelle}}</label>
+                    </div>
+                    <!-- <div class="col-12 form-group">
+                    <label class="control-label texte-content">Régime</label>
+                    <label class="form-control">{{ListeEmployeur[indice].sig.id_empl.id_activite.regime}}</label>
+                </div> -->
+                    <div class="col-4 form-group">
+                        <label class="control-label texte-content">Type de contrat</label>
+                        <label class="form-control">{{ListeEmployeur[indice].sig.type_contrat}}</label>
+                    </div>
+                    <div class="col-4 form-group">
+                        <label class="control-label texte-content">Date d'embauche</label>
+                        <label class="form-control">{{ListeEmployeur[indice].sig.date_debut_contrat |
+                            date:'dd/MM/yyyy'}}</label>
+                    </div>
+                    <div class="col-4 form-group">
+                        <label class="control-label texte-content">Date débauche</label>
+                        <label class="form-control">{{ListeEmployeur[indice].sig.date_fin_contrat |
+                            date:'dd/MM/yyyy'}}</label>
+                    </div>
+                    <!-- <div class="col-12">
+                    <div *ngIf="!afficheCIE" style="width: 100%; text-align: right;">
+                    <button (click)="voirCIE()" class="btn btn-success">Voir CIE</button>
+                    </div>
+                    <app-situation-compte-empl *ngIf="afficheCIE" [matriculeEmpl]="ListeEmployeur[indice].sig.id_empl.id_empl">
+                    </app-situation-compte-empl>
+                </div> -->
+                </div>
             </div>
 
             <!-- INFO MODE DE PAIEMENT -->
             <div class="tab-pane fade" id="infoMp">
-                <app-change-mode-paiement *ngIf="idDmdIJ && individu && afficheChangeMP" [idAcc]="idDmdIJ"
-                    [idIndividu]="individu.id_individu">
-                </app-change-mode-paiement>
+                <div style="width: 100%;">
+                    <div class="titre">
+                        <h4>BANQUE: <span style="text-transform: uppercase;">{{mpActuel.typeLibelle}}</span></h4>
+                        <h5>AGENCE: <span style="text-transform: uppercase;">{{mpActuel.typeAbrev}}</span></h5>
+                    </div>
+                    <div *ngIf="mpActuel.mp != null" class="row">
+                        <!-- SI VIREMENT -->
+                        <div *ngIf="mpActuel.mp.id_modepaieDmd == 1" class="col-12">
+                            <div class="row">
+                                <div class="col-4 form-group">
+                                    <label class="control-label texte-content">Banque</label>
+                                    <label class="form-control">{{mpActuel.mp.banque}}</label>
+                                </div>
+                                <div class="col-4 form-group">
+                                    <label class="control-label texte-content">Compte</label>
+                                    <label class="form-control">{{mpActuel.mp.numero_cmpt}}</label>
+                                </div>
+                                <div class="col-4 form-group">
+                                    <label class="control-label texte-content">Agence</label>
+                                    <label class="form-control">{{mpActuel.mp.agence}}</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- SI CAISSE -->
+                        <div *ngIf="mpActuel.mp.id_modepaieDmd == 4" class="col-12 form-group">
+                            <label class="control-label texte-content">Caisse</label>
+                            <label class="form-control">{{mpActuel.mp.caisse}}</label>
+                        </div>
+                        <!-- SI MOBILE BANKING -->
+                        <div *ngIf="mpActuel.mp.id_modepaieDmd == 3" class="col-12 form-group">
+                            <label class="control-label texte-content">Numéro</label>
+                            <label class="form-control">{{mpActuel.mp.numero}}</label>
+                        </div>
+                    </div>
+
+                    <div class="div-bas">
+                        <button data-toggle="modal" data-target="#choix-mp-dmd-module"
+                            class="btn btn-success">Lister</button>
+                    </div>
+
+                    <!-- MODAL CHOIX MODE DE PAIEMENT -->
+                    <div id="choix-mp-dmd-module" class="modal fade" tabindex="-1" role="dialog">
+                        <div class="modal-dialog modal-lg" style="max-width: 90%;min-width: 800px;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h6 class="modal-title">Liste des modes paiement de l'individ</h6>
+                                    <button type="button" class="close" data-dismiss="modal">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Banque</th>
+                                                <th>Agence</th>
+                                                <th>N° compte</th>
+                                                <th>Caisse</th>
+                                                <th>Numéro</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let l of listeMP; let index = index">
+                                                <td>{{l.mp.banque}}</td>
+                                                <td>{{l.mp.agence}}</td>
+                                                <td>{{l.mp.numero_cmpt}}</td>
+                                                <td>{{l.mp.caisse}}</td>
+                                                <td>{{l.mp.numero}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- <div class="modal-footer">
+                                    <button (click)="validerChoixMp()" class="btn btn-info"
+                                        data-dismiss="modal">Valider</button>
+                                </div> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <hr>
             <br>
             <div>
-                <!-- <div class="col-sm-12 form-group">
-                    <label class="control-label texte-content">Etats de la demande</label>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Statut</th>
-                                <th>Date</th>
-                                <th>Agent</th>
-                                <th *ngIf="CODE_SERVICE == SEM || CODE_SERVICE == SEM2">Observation SEM</th>
-                                <th>Observation</th>
-                            </tr>
-                        </thead>
-                        <tbody *ngIf="tecInfo">
-                            <tr *ngFor="let e of tecInfo.histoEtatDmd">
-                                <td style="white-space: nowrap;">{{prendEtat(e.etat)}}</td>
-                                <td>{{e.date_modif | date:'dd/MM/yyyy'}}</td>
-                                <td>{{e.user_modif}}</td>
-                                <td *ngIf="CODE_SERVICE == SEM || CODE_SERVICE == SEM2">{{e.observationsSem}}</td>
-                                <td>{{e.observations}}</td>
-                            </tr>
-                            <tr>
-                                <td style="white-space: nowrap;">{{prendEtat(tecInfo.accueilMod.etat)}}</td>
-                                <td *ngIf="tecInfo.accueilMod.date_modif != null">{{tecInfo.accueilMod.date_modif |
-                                    date:'dd/MM/yyyy'}}
-                                </td>
-                                <td *ngIf="tecInfo.accueilMod.date_modif == null">
-                                    {{tecInfo.accueilMod.dateInsertion | date:'dd/MM/yyyy'}}</td>
-                                <td *ngIf="tecInfo.accueilMod.user_modif != null">{{tecInfo.accueilMod.user_modif}}</td>
-                                <td *ngIf="tecInfo.accueilMod.user_modif == null">{{tecInfo.accueilMod.user_insert}}
-                                </td>
-                                <td>{{tecInfo.accueilMod.observations}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div> -->
             </div>
 
             <!-- VALIDATION PF -->
@@ -636,7 +784,7 @@
                             <div class="row">
                                 <div class="col-md-2"></div>
                                 <div class="col-sm-2">
-                                    <a *ngIf="cant_validate==true" [routerLink]="['/ij2-pf']"
+                                    <a *ngIf="cant_validate==true" [routerLink]="['/listeij2']"
                                         class="btn btn-warning btn-block" style="color: #fff;">Retour</a>
                                     <br>
                                 </div>
@@ -656,15 +804,12 @@
 
                                     <br>
                                 </div>
+                                <div *ngIf="dmdIJ && individu" class="col-md-12">
+                                    
+                                  </div>
                             </div>
                         </div>
                     </form>
-                </div>
-                <div *ngIf="dmdIJ && individu" class="col-md-12">
-                    <!-- <app-repaiement-droit-aperiodique *ngIf="montantOP > 0 && etat.id_type_etat===3 && DR"
-                        [idAcc]="dmdIJ.accueilMod.id_acc" [droit]="montantOP" [prestation]="PRESTATION"
-                        [idDemandeur]="individu.id_individu" [idEmpl]="dmdIJ.accueilMod.id_empl"
-                        [idSucc]="dmdIJ.accueilMod.id_succursale" [dr]="DR"></app-repaiement-droit-aperiodique> -->
                 </div>
             </div>
 

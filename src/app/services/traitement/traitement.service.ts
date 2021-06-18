@@ -1,22 +1,22 @@
 import { environment } from './../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { HttpClient, HttpHeaders , HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TraitementService {
-  url : any;
+  url: any;
   demande: any;
   adresse: any;
   individu: any;
   employeur: any;
-  notif:any;
+  notif: any;
   constructor(
     private http: HttpClient
-  ) { 
+  ) {
     this.url = environment.apiUrl + "/api/";
     this.demande = environment.apiDemande;
     this.adresse = environment.adresse;
@@ -24,29 +24,29 @@ export class TraitementService {
     this.employeur = environment.employeur;
   }
 
-  getDemandeWS(matricule_indiv, prestation, token:string){
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
+  getDemandeWS(matricule_indiv, prestation, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     let data = {
       prestation: prestation,
       id_individu: matricule_indiv
     }
-    return this.http.post<any>(this.demande + 'referenceDemandeByPrestationAndIndividu', data, {headers: headers, observe: 'response'} );
+    return this.http.post<any>(this.demande + 'referenceDemandeByPrestationAndIndividu', data, { headers: headers, observe: 'response' });
   }
 
-  getAdresse(matricule_indiv, token:string){
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
-    
-    return this.http.get(this.adresse + 'adresseByIndiv?id=' + matricule_indiv, {headers: headers, observe: 'response'} );
+  getAdresse(matricule_indiv, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+
+    return this.http.get(this.adresse + 'adresseByIndiv?id=' + matricule_indiv, { headers: headers, observe: 'response' });
   }
 
-  prendReferencePF(argument: any, token:string) {
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
+  prendReferencePF(argument: any, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     return this.http.post(this.demande + 'prendReferencePF', argument, { headers: headers, observe: 'response' });
   }
 
-  getnombredejourij1WS(id_acc, token:string){
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
-    return this.http.post(this.demande + 'nombrejourij1', id_acc, {headers: headers, observe: 'response'} );
+  getnombredejourij1WS(id_acc, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.post(this.demande + 'nombrejourij1', id_acc, { headers: headers, observe: 'response' });
   }
 
   decompteIjWS(idDmdIj: string, token: string) {
@@ -60,44 +60,44 @@ export class TraitementService {
     return this.http.post<any>(this.url + `auth/signin` + 'dat', data, { headers: httpheaders, observe: 'response' });
   }
 
-  saveAdresse(data, token:string) {
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
+  saveAdresse(data, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     return this.http.post(this.adresse + 'saveAdresse', data, { headers: headers, observe: 'response' });
   }
 
-  infoIndividu(data, token:string) {
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
-    return this.http.get<any>(this.individu + 'findByMatricule?id='+ data, { headers: headers, observe: 'response' });
+  infoIndividu(data, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.get<any>(this.individu + 'findByMatricule?id=' + data, { headers: headers, observe: 'response' });
   }
 
-  infoFamille(id, token:string) {
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
-    return this.http.get<any>(this.individu + 'getFamille?id='+ id, { headers: headers, observe: 'response' });
+  infoFamille(id, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.get<any>(this.individu + 'getFamille?id=' + id, { headers: headers, observe: 'response' });
   }
 
-  getEmployeur(id, token:string) {
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
-    return this.http.get<any>(this.employeur + 'getListSigemploisuccByIdIndividu?id='+ id, { headers: headers, observe: 'response' });
+  getEmployeur(id, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.get<any>(this.employeur + 'getListSigemploisuccByIdIndividu?id=' + id, { headers: headers, observe: 'response' });
   }
 
-  listeMP(id, token:string) {
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
-    return this.http.get<any>(this.individu + 'listMP?id='+ id, { headers: headers, observe: 'response' });
+  listeMP(id, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.get<any>(this.individu + 'listMP?id=' + id, { headers: headers, observe: 'response' });
   }
 
-  saveDemande(demande, token:string) {
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
+  saveDemande(demande, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     return this.http.post<any>(this.demande + 'ajouterDemandePF', demande, { headers: headers, observe: 'response' });
   }
 
-  getAllMp(token:string) {
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
-    return this.http.get<any>(this.individu + 'getallmodepaiement',  { headers: headers, observe: 'response' });
+  getAllMp(token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.get<any>(this.individu + 'getallmodepaiement', { headers: headers, observe: 'response' });
   }
 
-  prendInfoRecuParIdAcc(reference: number ,token:string) {
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
-    return this.http.get<any>(this.demande + 'prendInfoRecuParIdAcc?reference='+ reference , { headers: headers, observe: 'response' });
+  prendInfoRecuParIdAcc(reference: number, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.get<any>(this.demande + 'prendInfoRecuParIdAcc?reference=' + reference, { headers: headers, observe: 'response' });
   }
 
 
@@ -120,8 +120,8 @@ export class TraitementService {
     return kafkaStyle;
   }
 
-  infoAresseWS(id_access: string, token:string, type?: number) {
-    const headers = new HttpHeaders({"Authorization" : "Bearer " + token});
+  infoAresseWS(id_access: string, token: string, type?: number) {
+    const headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     let params = new HttpParams();
     params = params.set('id', id_access);
     if (type) {
@@ -130,7 +130,7 @@ export class TraitementService {
     return this.http.get<any>(this.adresse + 'adresseByIndiv', { headers: headers, params: params, observe: 'response' });
   }
 
-  sendNotif(id: string, token:string ,content: any) {
+  sendNotif(id: string, token: string, content: any) {
     return new Promise(
       (resolve, reject) => {
         this.infoAresseWS(id, token).subscribe(
@@ -155,19 +155,19 @@ export class TraitementService {
             };
 
             this.sendEmail(emailMsg).subscribe(
-            (mss) => {
+              (mss) => {
               }
             );
             this.addNotif(content).subscribe(
-            (res) => {
-            });
+              (res) => {
+              });
             resolve(true);
           }
         );
       }
     );
   }
-  sendSMS(content:any){
+  sendSMS(content: any) {
     const sms = {
       numero: content.numero,
       message: content.message
@@ -176,17 +176,17 @@ export class TraitementService {
     return this.http.post(this.notif + 'envoiSms', sms, { headers: headers, observe: 'response' });
   }
 
-  sendEmail(content:any){
+  sendEmail(content: any) {
     const sms = {
       email: content.email,
       subject: content.subject,
       message: content.message
     };
     let headers = new HttpHeaders();
-    return this.http.post(this.notif+ 'envoiEmail',sms , { headers: headers, observe: 'response' });
+    return this.http.post(this.notif + 'envoiEmail', sms, { headers: headers, observe: 'response' });
 
   }
-  addNotif(content: any){
+  addNotif(content: any) {
     const data = {
       expediteur: content.expediteur,
       destinataire: content.destinataire,
@@ -197,10 +197,10 @@ export class TraitementService {
       dateEnvoi: content.dateEnvoi
     };
     let headers = new HttpHeaders();
-    return this.http.post(this.notif + 'ajoutnotif',data, { headers: headers, observe: 'response' });
+    return this.http.post(this.notif + 'ajoutnotif', data, { headers: headers, observe: 'response' });
   }
 
-  prendListeDemandePF(filtre ,  token: string) {
+  prendListeDemandePF(filtre, token: string) {
     let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     return this.http.post<any>(this.demande + 'prendListeDemandePF', filtre, { headers: headers, observe: 'response' });
   }
@@ -223,5 +223,17 @@ export class TraitementService {
   saveModepaie(data, token: string) {
     let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     return this.http.post(this.individu + 'saveModepaie', data, { headers: headers, observe: 'response' });
+  }
+
+  modifierInfoRecuParIdAccPF(tecInfoRecu: string) {
+    return this.http.post(this.demande + 'modifierInfoRecuParIdAccPF', tecInfoRecu, { observe: 'response' });
+  }
+
+  setValidFormDataForDynamicForms_toKeyArray(validFormDataForDynamicForms: any[]) {
+    const rep = [];
+    for (let i = 0; i < validFormDataForDynamicForms.length; i++) {
+      rep.push(validFormDataForDynamicForms[i].key);
+    }
+    return rep;
   }
 }

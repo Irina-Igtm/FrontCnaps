@@ -22,7 +22,7 @@ export class ModifInfoRecuPfComponent implements OnInit {
   ngOnInit() {
     this.accessToken = localStorage.getItem('user');
     this.idToken = JSON.parse(this.accessToken).accessToken;
-    this.ij2srvc.prendInfoRecuParIdAccPF(this.referenceDmd, this.idToken).subscribe(liste=>{
+    this.ij2srvc.prendInfoRecuParIdAccPF("42202062118342", this.idToken).subscribe(liste=>{
       if(liste.status == 200){
         this.listeChamps = liste.body;
       }

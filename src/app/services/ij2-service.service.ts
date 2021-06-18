@@ -1,4 +1,4 @@
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -18,8 +18,10 @@ export class Ij2ServiceService {
   employeur: any;
   accuse: any;
   rglOp: any;
-  banque:any
+  banque: any
   dn: any;
+  portOp:any;
+  budget:any
   constructor(
     private http: HttpClient
   ) {
@@ -32,6 +34,8 @@ export class Ij2ServiceService {
     this.rglOp = environment.reglementOp
     this.banque = environment.banque
     this.dn = environment.dn
+    this.portOp = environment.op
+    this.budget = environment.budget
 
   }
 
@@ -47,8 +51,7 @@ export class Ij2ServiceService {
 
   infoIndivWebService(id_acces: string, token: string) {
     let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
-    let param = new HttpParams().set('id', id_acces);
-    return this.http.get(this.individu + 'individu', { headers: headers, params: param, observe: 'response' });
+    return this.http.get<any>(this.individu + 'findByMatricule?id=' + id_acces, { headers: headers, observe: 'response' });
   }
   getmodepaiebyidaccWS(idacc: string, token: string) {
     let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
@@ -151,29 +154,30 @@ export class Ij2ServiceService {
     group['observations'] = new FormControl('');
     return new FormGroup(group);
   }
-  prendInfoRecuParIdAccPF(idAcc: string, token : string) {
+  prendInfoRecuParIdAccPF(idAcc: string, token: string) {
     const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
-    return this.http.get<any>(this.demande + 'prendInfoRecuParIdAccPF?reference=' + idAcc, {headers: headers, 
-       observe: 'response' });
+    return this.http.get<any>(this.demande + 'prendInfoRecuParIdAccPF?reference=' + idAcc, {
+      headers: headers,
+      observe: 'response'
+    });
   }
 
-  modifierInfoRecuParIdAccPF(tecInfoRecu: string, token :string) {
+  modifierInfoRecuParIdAccPF(tecInfoRecu: string, token: string) {
     const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
     return this.http.post(this.demande + 'modifierInfoRecuParIdAccPF', tecInfoRecu, { headers: headers, observe: 'response' });
   }
 
   getAllmodepaiementWS(token: string) {
-    const headers = new HttpHeaders();
-    headers.set('Authorization', 'Bearer ' + token);
-    return this.http.get<any>(this.individu + 'getallmodepaiement', {headers: headers, observe: 'response'});
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.get<any>(this.individu + 'getallmodepaiement', { headers: headers, observe: 'response' });
   }
 
   listeMPbymatriculeWS(id: string, token?: string) {
     let headers = new HttpHeaders();
-    if(token != null && token != undefined){
-      headers = new HttpHeaders({'Authorization': 'Bearer ' + token});
+    if (token != null && token != undefined) {
+      headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
     }
-    return this.http.get<any>(this.banque + 'getmodepaiementbytierstechnique?idtiers=' + id, {headers: headers, observe: 'response'});
+    return this.http.get<any>(this.banque + 'getmodepaiementbytierstechnique?idtiers=' + id, { headers: headers, observe: 'response' });
   }
 
   creerModePaiementOP(idAcc, modePaiement) {
@@ -216,5 +220,154 @@ export class Ij2ServiceService {
   updatemodepaiementop(mp) {
     const headers = new HttpHeaders();
     return this.http.post(this.individu + 'updatemodepaiementop', mp, { headers: headers, observe: 'response' });
+  }
+  getMPDmd(idacc, token: string) {
+    const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
+    return this.http.get(this.individu + 'avoirMpDmp?id_acc=' + idacc, { headers: headers, observe: 'response' });
+  }
+  getPiecesRequiseIj2WS(data, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.post(this.demande + "listeTecPcsReqIJ2PF", data, { headers: headers, observe: 'response' });
+  }
+
+  setValidFormDataForDynamicFormsPieces(listForm) {
+    const inputs: InputBase<any>[] = [];
+    for (let i = 0; i < listForm.length; i++) {
+      const inputTextBox = new InputTextBox({
+        key: listForm[i].id_piece,
+        label: listForm[i].libelle,
+        type: listForm[i].type_champ,
+        value: '',
+        required: true
+      });
+      inputs.push(inputTextBox);
+    }
+    return inputs;
+  }
+
+  addControlToFormGroupPcs(fg: FormGroup, questions: InputBase<any>[]) {
+    const group: any = {};
+    questions.forEach(question => {
+      fg.addControl(question.key, question.required ? new FormArray(question.value || [], Validators.required) : new FormArray(question.value || []));
+    });
+    return fg;
+  }
+
+  setTecInfRec(formValue: any, id_acc: string, tecInfNonReq: any[]) {
+    const keys = Object.keys(formValue);
+    const tecInfRec = [];
+    for (let i = 0; i < keys.length; i++) {
+      let non_requis = 0;
+      for (let j = 0; j < tecInfNonReq.length; j++) {
+        if (keys[i] === tecInfNonReq[j]) {
+          non_requis++;
+          break;
+        }
+      }
+      if (non_requis === 0) {
+        const x = {
+          'idAcc': id_acc,
+          'idTypeInfo': keys[i],
+          'valeur': formValue[keys[i]]
+        };
+        tecInfRec.push(x);
+      }
+    }
+    return tecInfRec;
+  }
+
+  setValidFormDataForDynamicForms_toKeyArray(validFormDataForDynamicForms: any[]) {
+    const rep = [];
+    for (let i = 0; i < validFormDataForDynamicForms.length; i++) {
+      rep.push(validFormDataForDynamicForms[i].key);
+    }
+    return rep;
+  }
+
+  setTecPcsRec(formValue: any, id_acc: string, tecInfNonReq: any[],) {
+    const keys = Object.keys(formValue);
+    const tecInfRec = [];
+    for (let i = 0; i < keys.length; i++) {
+      let non_requis = 0;
+      for (let j = 0; j < tecInfNonReq.length; j++) {
+        if (keys[i] === tecInfNonReq[j]) {
+          non_requis++;
+          break;
+        }
+      }
+      if (non_requis === 0) {
+        const x = {
+          'id_acc': id_acc,
+          'id_piece': keys[i],
+          'liens_fichier': ''
+        };
+        tecInfRec.push(x);
+      }
+    }
+    return tecInfRec;
+  }
+
+  addControlToFormGroup(fg: FormGroup, questions: InputBase<any>[]) {
+    const group: any = {};
+    questions.forEach(question => {
+      fg.addControl(question.key, question.required ? new FormControl(question.value || '', Validators.required)
+        : new FormControl(question.value || ''));
+    });
+    return fg;
+  }
+
+  getListLibelleWS(prestation: string, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.post(this.demande + "listeTecInfoReqLibelle", prestation, { headers: headers, observe: 'response' });
+  }
+
+  getTecPcsForMongo(formValue: any, tecInfNonReq: any[],) {
+    const keys = Object.keys(formValue);
+    console.log(keys);
+    const tecPcs = [];
+    for (let i = 0; i < keys.length; i++) {
+      let non_requis = 0;
+      for (let j = 0; j < tecInfNonReq.length; j++) {
+        if (keys[i] === tecInfNonReq[j]) {
+          non_requis++;
+          break;
+        }
+      }
+      if (non_requis === 0) {
+        tecPcs.push(formValue[keys[i]]);
+      }
+    }
+    console.log(tecPcs);
+    return tecPcs;
+  }
+
+  prendListeIndiv(filtre ,token:string){
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.post(this.individu + 'prendListeIndiv', filtre, { headers: headers, observe: 'response' });
+
+  }
+
+  changerEtatDemandePF(argument: any,  token:string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.post(this.demande + 'changerEtatDemandePF', argument, { headers: headers, observe: 'response' });
+  }
+  saveTecoptempWS(data, token?){
+    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
+    return this.http.post(this.portOp + 'saveTecoptemp', data, {headers: headers, observe: 'response'} );
+  }
+
+  saveFilesWS(files: Array<any>) {
+    const headers = new HttpHeaders();
+    return this.http.post(this.demande + 'sauvegardeFichiers', files, { headers: headers, observe: 'response' });
+  }
+
+  listTecOpTempWS(argument: any, token:string){
+    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
+    return this.http.post(this.portOp + 'listTecOpTemp', argument, {headers: headers, observe: 'response'} );
+  }
+
+  budgetTopicWS(fonction: string, argument: any, token?:string){
+    let headers = new HttpHeaders();
+    return this.http.post(this.budget + fonction, argument, {headers: headers, observe: 'response'} );
   }
 }

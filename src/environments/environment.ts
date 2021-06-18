@@ -7,12 +7,14 @@ export const environment = {
   production: false,
   apiUrl: 'http://localhost:4250',
   apiDemande: 'http://localhost:8008/',
-  adresse: 'http://localhost:3000/',
+  adresse: 'http://localhost:2569/',
   individu: 'http://localhost:6888/',
   employeur: 'http://localhost:7888/',
   accuse:'http://localhost:5459/',
   reglementOp:'http://localhost:8529/',
   banque:'http://localhost:9501/',
   dn:'http://localhost:6146/',
+  op:'http://localhost:8529/',
+  budget:'http://localhost:9589/'
 };
 
