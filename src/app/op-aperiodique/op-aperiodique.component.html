@@ -3,10 +3,10 @@
     <span class="nav-link" [ngClass]="{'active cat-active': categorie == 'OP'}" (click)="clickCategorie('OP')">Création
       OP</span>
   </li>
-  <!-- <li *ngIf="estDirecteur" class="nav-item nav-cat">
+  <li *ngIf="estDirecteur" class="nav-item nav-cat">
       <span class="nav-link" [ngClass]="{'active cat-active': categorie == 'OPD'}" (click)="clickCategorie('OPD')">Création
         OP (Directeur)</span>
-    </li> -->
+    </li>
   <li class="nav-item nav-cat">
     <span class="nav-link" [ngClass]="{'active cat-active': categorie == 'Liste'}"
       (click)="clickCategorie('Liste')">Liste OP</span>
@@ -31,7 +31,8 @@
         </select>
       </div>
     </div>
-    <table class="table table-striped">
+    <div class="table-responsive">
+    <table class="table table-hover">
       <thead>
         <tr>
           <th>Ref demande</th>
@@ -43,7 +44,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let temp of OP.fileAttenteOP">
+        <tr *ngFor="let temp of OP.fileAttente">
           <td>{{temp.id_demande}}</td>
           <td>{{temp.id_benef}}</td>
           <td>{{temp.nomBenef}}</td>
@@ -59,6 +60,7 @@
         </tr>
       </tfoot>
     </table>
+  </div>
     <label *ngIf="OP.fileAttenteOP.length > 0">Nombre de bénéficiaire: {{OP.fileAttenteOP.length}}</label>
     <div *ngIf="OP.fileAttente != null" style="width: 100%; text-align: center;">
       <button *ngIf="OP.fileAttenteOP.length > 0 && !OP.charge"

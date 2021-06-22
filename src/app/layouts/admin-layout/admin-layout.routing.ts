@@ -1,3 +1,4 @@
+import { OpAperiodiqueComponent } from './../../op-aperiodique/op-aperiodique.component';
 import { OpIj2Component } from './../../op-ij2/op-ij2.component';
 import { DetailsIj2Component } from './../../details-ij2/details-ij2.component';
 import { AccuseReceptionComponent } from './../../accuse-reception/accuse-reception.component';
@@ -73,4 +74,5 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'details-ij2/:id', component: DetailsIj2Component, canActivate: [AuthGuard] },
     { path: 'upload', component: UploadFilesComponent, canActivate: [AuthGuard] },
     { path: 'op-ij2', component: OpIj2Component, canActivate: [AuthGuard] },
+    { path: 'op-aperiodique', component: OpAperiodiqueComponent, canActivate: [AuthGuard] },
 ];

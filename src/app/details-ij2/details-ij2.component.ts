@@ -606,7 +606,6 @@ export class DetailsIj2Component implements OnInit {
               obsA => {
                 if (obsA.body != null && obsA.body['length'] > 0) {
                   objetOP.id_adresse = obsA.body[0].id_adresse;
-                  console.log("OBJECTOP" ,  objetOP);
                   that.effectuerGroupementPourOP(objetOP);
                 }
                 else {
@@ -907,7 +906,7 @@ export class DetailsIj2Component implements OnInit {
           const notifMessage = this.notification == "" ? "Demande d'indemnité journalière 2ème tranche ref - " + this.idDmdIJ + " réfusée." : this.notification;
           const dateToday = this.datePipe.transform(new Date(Date.now()), 'yyyy-MM-dd');
           const content = {
-            expediteur: JSON.parse(localStorage.getItem('user')).id_acces,
+            expediteur: JSON.parse(localStorage.getItem('user')).id,
             destinataire: this.individu.id_individu,
             titre: "Demande d'indemnité journalière 2ème tranche",
             message: notifMessage,

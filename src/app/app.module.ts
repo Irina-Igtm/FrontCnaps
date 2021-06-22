@@ -1,3 +1,4 @@
+import { OpAperiodiqueComponent } from './op-aperiodique/op-aperiodique.component';
 import { TraitementService } from './services/traitement/traitement.service';
 import { LoginComponent } from './account/login/login.component';
 import { AccountService } from './services/account/account.service';
@@ -45,7 +46,6 @@ import { OpIj2Component } from './op-ij2/op-ij2.component';
 import { DetailsIj2Component } from './details-ij2/details-ij2.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { UploadFilesComponent } from './components/upload-files/upload-files.component';
-
 enableProdMode();
 
 @NgModule({
@@ -82,6 +82,7 @@ enableProdMode();
     OpIj2Component,
     DetailsIj2Component,
     UploadFilesComponent,
+    OpAperiodiqueComponent,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },

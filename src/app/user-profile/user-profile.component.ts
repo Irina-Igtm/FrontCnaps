@@ -533,27 +533,27 @@ export class UserProfileComponent implements OnInit {
   }
 
   insererDemande() {
-    const formValue = this.ijForm.value;
-    let dateDepot;
-    const tecInfoNonRequis = this.ij2srvc.setValidFormDataForDynamicForms_toKeyArray(this.pieces);
-    tecInfoNonRequis.push('matrIndiv');
-    //  tecInfoNonRequis.push('empl');
-    const tecInfRec = this.ij2srvc.setTecInfRec(formValue, this.referenceDemandeIj, tecInfoNonRequis);
+    // const formValue = this.ijForm.value;
+    // let dateDepot;
+    // const tecInfoNonRequis = this.ij2srvc.setValidFormDataForDynamicForms_toKeyArray(this.pieces);
+    // tecInfoNonRequis.push('matrIndiv');
+    // //  tecInfoNonRequis.push('empl');
+    // const tecInfRec = this.ij2srvc.setTecInfRec(formValue, this.referenceDemandeIj, tecInfoNonRequis);
 
-    let tecPcsNonRequis = this.ij2srvc.setValidFormDataForDynamicForms_toKeyArray(this.inputs);
-    tecPcsNonRequis.push('matrIndiv');
-    let tecPcsRec = this.ij2srvc.setTecPcsRec(formValue, this.referenceDemandeIj, tecPcsNonRequis);
+    // let tecPcsNonRequis = this.ij2srvc.setValidFormDataForDynamicForms_toKeyArray(this.inputs);
+    // tecPcsNonRequis.push('matrIndiv');
+    // let tecPcsRec = this.ij2srvc.setTecPcsRec(formValue, this.referenceDemandeIj, tecPcsNonRequis);
 
-    for (let i = 0; i < tecInfRec.length; i++) {
-      if (tecInfRec[i].idTypeInfo === '45') {
-        dateDepot = tecInfRec[i].valeur;
-        break;
-      }
-    }
+    // for (let i = 0; i < tecInfRec.length; i++) {
+    //   if (tecInfRec[i].idTypeInfo === '45') {
+    //     dateDepot = tecInfRec[i].valeur;
+    //     break;
+    //   }
+    // }
     //eto zao ambony
     let msg = {}
-    const uploadImageData = new FormData();
-    uploadImageData.append('imageFile', this.selectedFile, this.selectedFile.name)
+    // const uploadImageData = new FormData();
+    // uploadImageData.append('imageFile', this.selectedFile, this.selectedFile.name)
     msg = {
       accueilMod: {
         id_acc: this.referenceDemandeIj,
@@ -590,7 +590,7 @@ export class UserProfileComponent implements OnInit {
         IdACc: this.referenceDemandeIj,
         caisse: this.modePaie.caisse
       },
-      tecPcsRecMod: tecPcsRec,
+      // tecPcsRecMod: tecPcsRec,
 
     };
 
@@ -605,31 +605,31 @@ export class UserProfileComponent implements OnInit {
         const notifMessage = "Votre demande d'indemnité journalière deuxième tranche Réf-" + this.referenceDemandeIj + " a été enregistré mais en cours de traitement.";
         this.toastr.success(notifMessage);
         this.id_demande = this.referenceDemandeIj;
-        const Pcs = this.ij2srvc.getTecPcsForMongo(formValue, tecPcsNonRequis);
-        let fichiers = [];
-        for (let i = 0; i < Pcs.length; i++) {
-          if (Array.isArray(Pcs[i])) {
-            for (let j = 0; j < Pcs[i].length; j++) {
-              Pcs[i][j].serviceName = "Demande IJ2";
-              this.piecesAccuse.push(Pcs[i][j].name);
-              fichiers.push(Pcs[i][j]);
-            }
-          }
-        }
-        if (this.autrePieceValue.length > 0) {
-          for (let i = 0; i < this.autrePieceValue.length; i++) {
-            this.autrePieceValue[i].id_files = this.id_demande;
-            this.piecesAccuse.push(this.autrePieceValue[i].name);
-            fichiers.push(this.autrePieceValue[i]);
-          }
-        }
-        this.ij2srvc.saveFilesWS(fichiers).subscribe(data => {
-          if (data.status == 200) {
-            this.toastr.success('Fichier enregistré avec succes');
-          } else {
-            this.toastr.warning('Erreur d\'enregistrement du fichier');
-          }
-        });
+        // const Pcs = this.ij2srvc.getTecPcsForMongo(formValue, tecPcsNonRequis);
+        // let fichiers = [];
+        // for (let i = 0; i < Pcs.length; i++) {
+        //   if (Array.isArray(Pcs[i])) {
+        //     for (let j = 0; j < Pcs[i].length; j++) {
+        //       Pcs[i][j].serviceName = "Demande IJ2";
+        //       this.piecesAccuse.push(Pcs[i][j].name);
+        //       fichiers.push(Pcs[i][j]);
+        //     }
+        //   }
+        // }
+        // if (this.autrePieceValue.length > 0) {
+        //   for (let i = 0; i < this.autrePieceValue.length; i++) {
+        //     this.autrePieceValue[i].id_files = this.id_demande;
+        //     this.piecesAccuse.push(this.autrePieceValue[i].name);
+        //     fichiers.push(this.autrePieceValue[i]);
+        //   }
+        // }
+        // this.ij2srvc.saveFilesWS(fichiers).subscribe(data => {
+        //   if (data.status == 200) {
+        //     this.toastr.success('Fichier enregistré avec succes');
+        //   } else {
+        //     this.toastr.warning('Erreur d\'enregistrement du fichier');
+        //   }
+        // });
         localStorage.setItem("piecesAccuse", JSON.stringify(this.piecesAccuse));
         const dateToday = this.datePipe.transform(new Date(Date.now()), 'yyyy-MM-dd')
         this.showModalAR();

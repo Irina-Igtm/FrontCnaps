@@ -21,7 +21,8 @@ export class Ij2ServiceService {
   banque: any
   dn: any;
   portOp:any;
-  budget:any
+  budget:any;
+  compta:any;
   constructor(
     private http: HttpClient
   ) {
@@ -36,6 +37,7 @@ export class Ij2ServiceService {
     this.dn = environment.dn
     this.portOp = environment.op
     this.budget = environment.budget
+    this.compta = environment.compta
 
   }
 
@@ -370,4 +372,60 @@ export class Ij2ServiceService {
     let headers = new HttpHeaders();
     return this.http.post(this.budget + fonction, argument, {headers: headers, observe: 'response'} );
   }
+
+  // pretnotnullbysousprestWS(prestation, token: string) {
+  //   const data = {
+  //     pmsousprestcode: prestation
+  //   };
+  //   const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
+  //   return this.http.post(this. + 'pretnotnullbysousprestCompta', data, { headers: headers, observe: 'response' });
+  // }
+
+  transformeWSReponse(wsReponse): { msg: any, success: boolean } {
+    const kafkaStyle = {
+      msg: null,
+      success: false
+    };
+    // tslint:disable-next-line:triple-equals
+    if (wsReponse.status == 200) {
+      if (wsReponse.body != null) {
+        kafkaStyle.success = true;
+        kafkaStyle.msg = wsReponse.body;
+      } else {
+        kafkaStyle.msg = 'Pas de données';
+      }
+    } else {
+      kafkaStyle.msg = 'Pas de réponse';
+    }
+    return kafkaStyle;
+  }
+
+  getCptbyGroupeWS(debut_idpcg, token:string){
+    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
+    let data = {
+      idpcg: debut_idpcg
+    };
+    return this.http.post(this.compta + "getCptbyGroupeCompta", data, {headers: headers, observe: 'response'} );
+  }
+
+
+  listTecOpTempSupWS(argument: any, token:string){
+    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
+    return this.http.post( this.portOp + 'listTecOpTempSup', argument, {headers: headers, observe: 'response'} );
+  }
+
+  
+  infoDirectionWS(id_access: string, token?: string) {
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
+    }
+    return this.http.get<any>(this.individu+ 'getservicedirectionagent?idagent=' + id_access, { headers: headers, observe: 'response' });
+  }
+  addTecopWS(data, token: string) {
+    const headers = new HttpHeaders();
+    headers.set('Authorization', 'Bearer ' + token);
+    return this.http.post(this.portOp + 'addTecopAperiodique', data, { headers: headers, observe: 'response' } );
+  }
+  
 }

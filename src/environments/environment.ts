@@ -15,6 +15,7 @@ export const environment = {
   banque:'http://localhost:9501/',
   dn:'http://localhost:6146/',
   op:'http://localhost:8529/',
-  budget:'http://localhost:9589/'
+  budget:'http://localhost:9589/',
+  compta:'http://localhost:5670/'
 };
 

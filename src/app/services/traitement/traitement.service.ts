@@ -14,6 +14,7 @@ export class TraitementService {
   individu: any;
   employeur: any;
   notif: any;
+  portOp : any
   constructor(
     private http: HttpClient
   ) {
@@ -22,6 +23,8 @@ export class TraitementService {
     this.adresse = environment.adresse;
     this.individu = environment.individu;
     this.employeur = environment.employeur;
+    this.portOp = environment.op
+
   }
 
   getDemandeWS(matricule_indiv, prestation, token: string) {
@@ -236,4 +239,22 @@ export class TraitementService {
     }
     return rep;
   }
+
+  listTecopbyprestationWS(argument: any, token: string) {
+    const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
+    return this.http.post( this.portOp + 'listTecopbyprestation', argument, { headers: headers, observe: 'response' });
+  }
+
+  
+  listTecopByIdWS(idop: string, token: string) {
+    const headers = new HttpHeaders();
+    headers.set('Authorization', 'Bearer ' + token);
+    return this.http.get<any>(this.portOp + 'listTecopById?idop=' + idop, { headers: headers, observe: 'response' });
+  }
+
+  // soucheTechniqueWS(idOp, token: string) {
+  //   const headers = new HttpHeaders();
+  //   headers.set('Authorization', 'Bearer ' + token);
+  //   return this.httpClient.get<any>(this.global.wsLink.replace('port', this.portTresoTech) + 'soucheTechnique?numOp=' + idOp, { headers: headers, observe: 'response' });
+  // }
 }
