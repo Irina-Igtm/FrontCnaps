@@ -58,13 +58,11 @@ export class ListeIJ2Component implements OnInit {
   ngOnInit(): void {
     document.title = "LISTE - IJ2";
     this.accessToken = localStorage.getItem('user');
-    this.idToken = JSON.parse(this.accessToken).accessToken;    
-    this.pagination = 1;
-    this.prendListe();
+    this.idToken = JSON.parse(this.accessToken).accessToken;  
+    this.getEtatDemande();  
   }
   changeCritere() {
     this.filtre.taille = this.max,
-      this.filtre.pagination = this.page,
       this.filtre.type_etat = this.etat,
       this.filtre.dateReception = this.filtre.dateReception,
       this.filtre.id_acc = this.filtre.id_acc,
@@ -88,9 +86,14 @@ export class ListeIJ2Component implements OnInit {
         this.toastr.warning('Impossible de recupérer la liste de demande IJ2');
         this.show = false;
       }
-      this.getEtatDemande();
+     
     }
     );
+  }
+
+  changeValue(page){
+    this.filtre.pagination = page;
+    this.changeCritere()
   }
 
   onClickIJDetails(iddemande) {

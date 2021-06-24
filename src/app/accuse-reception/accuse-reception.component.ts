@@ -151,12 +151,10 @@ export class AccuseReceptionComponent implements OnInit {
   imprimer() {
     this.showPrint = true;
     let that = this;
-    $('.footer_cnaps').hide();
     setTimeout(() => {
       window.print();
       setTimeout(() => {
         that.showPrint = false;
-        $('.footer_cnaps').show();
         this.routes.navigate(['/accueil-connecte']);
       }, 1000);
     }, 2000);

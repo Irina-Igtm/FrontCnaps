@@ -20,9 +20,9 @@ export class Ij2ServiceService {
   rglOp: any;
   banque: any
   dn: any;
-  portOp:any;
-  budget:any;
-  compta:any;
+  portOp: any;
+  budget: any;
+  compta: any;
   constructor(
     private http: HttpClient
   ) {
@@ -343,19 +343,19 @@ export class Ij2ServiceService {
     return tecPcs;
   }
 
-  prendListeIndiv(filtre ,token:string){
+  prendListeIndiv(filtre, token: string) {
     let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     return this.http.post(this.individu + 'prendListeIndiv', filtre, { headers: headers, observe: 'response' });
 
   }
 
-  changerEtatDemandePF(argument: any,  token:string) {
+  changerEtatDemandePF(argument: any, token: string) {
     let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     return this.http.post(this.demande + 'changerEtatDemandePF', argument, { headers: headers, observe: 'response' });
   }
-  saveTecoptempWS(data, token?){
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
-    return this.http.post(this.portOp + 'saveTecoptemp', data, {headers: headers, observe: 'response'} );
+  saveTecoptempWS(data, token?) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.post(this.portOp + 'saveTecoptemp', data, { headers: headers, observe: 'response' });
   }
 
   saveFilesWS(files: Array<any>) {
@@ -363,14 +363,14 @@ export class Ij2ServiceService {
     return this.http.post(this.demande + 'sauvegardeFichiers', files, { headers: headers, observe: 'response' });
   }
 
-  listTecOpTempWS(argument: any, token:string){
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
-    return this.http.post(this.portOp + 'listTecOpTemp', argument, {headers: headers, observe: 'response'} );
+  listTecOpTempWS(argument: any, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.post(this.portOp + 'listTecOpTemp', argument, { headers: headers, observe: 'response' });
   }
 
-  budgetTopicWS(fonction: string, argument: any, token?:string){
+  budgetTopicWS(fonction: string, argument: any, token?: string) {
     let headers = new HttpHeaders();
-    return this.http.post(this.budget + fonction, argument, {headers: headers, observe: 'response'} );
+    return this.http.post(this.budget + fonction, argument, { headers: headers, observe: 'response' });
   }
 
   // pretnotnullbysousprestWS(prestation, token: string) {
@@ -400,32 +400,37 @@ export class Ij2ServiceService {
     return kafkaStyle;
   }
 
-  getCptbyGroupeWS(debut_idpcg, token:string){
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
+  getCptbyGroupeWS(debut_idpcg, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
     let data = {
       idpcg: debut_idpcg
     };
-    return this.http.post(this.compta + "getCptbyGroupeCompta", data, {headers: headers, observe: 'response'} );
+    return this.http.post(this.compta + "getCptbyGroupeCompta", data, { headers: headers, observe: 'response' });
   }
 
 
-  listTecOpTempSupWS(argument: any, token:string){
-    let headers = new HttpHeaders({"Authorization" : "Bearer " + token});
-    return this.http.post( this.portOp + 'listTecOpTempSup', argument, {headers: headers, observe: 'response'} );
+  listTecOpTempSupWS(argument: any, token: string) {
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.post(this.portOp + 'listTecOpTempSup', argument, { headers: headers, observe: 'response' });
   }
 
-  
+
   infoDirectionWS(id_access: string, token?: string) {
     let headers = new HttpHeaders();
     if (token) {
       headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
     }
-    return this.http.get<any>(this.individu+ 'getservicedirectionagent?idagent=' + id_access, { headers: headers, observe: 'response' });
+    return this.http.get<any>(this.individu + 'getservicedirectionagent?idagent=' + id_access, { headers: headers, observe: 'response' });
   }
+
   addTecopWS(data, token: string) {
-    const headers = new HttpHeaders();
-    headers.set('Authorization', 'Bearer ' + token);
-    return this.http.post(this.portOp + 'addTecopAperiodique', data, { headers: headers, observe: 'response' } );
+    let headers = new HttpHeaders({ "Authorization": "Bearer " + token });
+    return this.http.post(this.portOp + 'addTecopAperiodique', data, { headers: headers, observe: 'response' });
   }
-  
+
+  // soucheTechniqueWS(idOp, token: string) {
+  //   const headers = new HttpHeaders();
+  //   headers.set('Authorization', 'Bearer ' + token);
+  //   return this.http.get<any>(this. + 'soucheTechnique?numOp=' + idOp, { headers: headers, observe: 'response' });
+  // }
 }

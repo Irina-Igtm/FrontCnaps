@@ -288,9 +288,9 @@
           </div>
           <div class="card-body">
             <form>
-              <div class="table-responsive">
+              <div class="table-responsive" *ngIf="virement">
                 <table class="table table-hover table-sm">
-                  <thead>
+                  <thead style="text-transform: capitalize;">
                     <th style="size: 5%;"></th>
                     <th>Banque</th>
                     <th>Agence</th>
@@ -298,11 +298,41 @@
                     <th>Caisse</th>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let mp of listeMP">
+                    <tr *ngFor="let mp of virement">
                       <td><input type="radio" (change)="modePaiementChange(mp)"></td>
                       <td>{{mp.banque}}</td>
                       <td>{{mp.agence}}</td>
                       <td>{{mp.numero}}</td>
+                      <td>{{mp.caisse}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="table-responsive" *ngIf="mobile">
+                <table class="table table-hover table-sm">
+                  <thead style="text-transform: capitalize;">
+                    <th style="size: 5%;"></th>
+                    <th>Numero telephone</th>
+                    <th>Type</th>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let mp of mobile">
+                      <td><input type="radio" (change)="modePaiementChange(mp)"></td>
+                      <td>{{mp.numero}}</td>
+                      <td>{{mp.caisse}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="table-responsive" *ngIf="espece">
+                <table class="table table-hover table-sm">
+                  <thead style="text-transform: capitalize;">
+                    <th style="size: 5%;"></th>
+                    <th>Caisse</th>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let mp of mobile">
+                      <td><input type="radio" (change)="modePaiementChange(mp)"></td>
                       <td>{{mp.caisse}}</td>
                     </tr>
                   </tbody>

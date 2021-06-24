@@ -1,5 +1,6 @@
 import { OpAperiodiqueComponent } from './op-aperiodique/op-aperiodique.component';
 import { TraitementService } from './services/traitement/traitement.service';
+import { ConvertionService } from './services/convertion/convertion.service';
 import { LoginComponent } from './account/login/login.component';
 import { AccountService } from './services/account/account.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -29,7 +30,7 @@ import {
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import { ErrorInterceptor } from './helper/error.interceptor';
 import { JwtInterceptor } from './helper/jwt.interceptor';
-import { CommonModule } from '@angular/common';  
+import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
@@ -88,7 +89,8 @@ enableProdMode();
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     AccountService,
-    TraitementService
+    TraitementService,
+    ConvertionService
   ],
   bootstrap: [AppComponent]
 })

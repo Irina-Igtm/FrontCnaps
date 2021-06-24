@@ -199,6 +199,10 @@ export class UserProfileComponent implements OnInit {
 
   //info
   employeur: any;
+  // Liste MP
+  virement: any[];
+  mobile: any[];
+  espece: any[];
 
   constructor(
     private traitSvc: TraitementService,
@@ -255,8 +259,21 @@ export class UserProfileComponent implements OnInit {
     this.traitSvc.listeMP(matricule, this.idToken).subscribe(res => {
       if (res.status == 200) {
         console.log(res);
-
+        this.virement = []
+        this.mobile = []
+        this.espece =[]
         this.listeMP = res.body
+        for (let index = 0; index < res.body.length; index++) {
+          if (res.body[index].banque != null) {
+            this.virement.push(res.body[index])
+          }
+          if (res.body[index].caisse == null && res.body[index].banque == null) {
+            this.mobile.push(res.body[index])
+          }
+          if (res.body[index].caisse != null && res.body[index].banque == null) {
+            this.espece.push(res.body[index])
+          }
+        }
       } else {
         this.toastr.error('error', "Erreur de connexion Mode de payement")
       }

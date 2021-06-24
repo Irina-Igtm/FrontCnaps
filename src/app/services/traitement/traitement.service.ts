@@ -247,8 +247,7 @@ export class TraitementService {
 
   
   listTecopByIdWS(idop: string, token: string) {
-    const headers = new HttpHeaders();
-    headers.set('Authorization', 'Bearer ' + token);
+    const headers = new HttpHeaders({ 'Authorization': 'Bearer ' + token });
     return this.http.get<any>(this.portOp + 'listTecopById?idop=' + idop, { headers: headers, observe: 'response' });
   }
 

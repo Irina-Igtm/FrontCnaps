@@ -2,6 +2,7 @@ import { TraitementService } from './../services/traitement/traitement.service';
 import { Ij2ServiceService } from './../services/ij2-service.service';
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import {ConvertionService} from './../services/convertion/convertion.service';
 
 declare var $: any;
 
@@ -97,7 +98,8 @@ export class OpAperiodiqueComponent implements OnInit {
     constructor(
         private toast: ToastrService,
         private traitSrvc: TraitementService,
-        private ij2srvc: Ij2ServiceService
+        private ij2srvc: Ij2ServiceService,
+        private convertionService: ConvertionService
     ) { }
 
     ngOnInit() {
@@ -110,7 +112,7 @@ export class OpAperiodiqueComponent implements OnInit {
         this.ij2srvc.infoDirectionWS(this.matricule, this.idToken).subscribe(
             obsDrWS => {
                 if (obsDrWS.status == 200) {
-                    console.log("INFO AGNET", obsDrWS.body);
+                    console.log("INFO AGENT", obsDrWS.body);
 
                     if (obsDrWS.body.code_fonction == "02A") {
                         that.estDirecteur = true;
@@ -326,12 +328,10 @@ export class OpAperiodiqueComponent implements OnInit {
                 that.toast.success('OP généré avec succès');
                 that.OP.fileAttenteOP = [];
                 const tempListe = [];
-                for (const benef of that.OP.fileAttente.tecop.tecbenef) {
-                    if (benef.id_mode_paiement.abrevModePaiement != that.OP.abrevMP) {
+                for (const benef of that.OP.fileAttente) {
                         tempListe.push(benef);
-                    }
                 }
-                that.OP.fileAttente.tecop.tecbenef = tempListe;
+                that.OP.fileAttente = tempListe;
                 argDmd.numOP = obsOp.body['tecop'].id_op;
                 /*that.rfaService.insertionOpDmdGroupe(argDmd, that.prestation).subscribe(obs => {
                   console.log("insertionOpDmdGroupe", obs);
@@ -374,7 +374,7 @@ export class OpAperiodiqueComponent implements OnInit {
                         else {
                             that.texteBenef = "DIVERS";
                         }
-                        // that.Export.montantLettre = that.convertionService.NumberToLetter(that.Export.montant);
+                        that.Export.montantLettre = that.convertionService.NumberToLetter(that.Export.montant);
                         // that.prendSouche(numOp, 0);
                     }
                 });
@@ -386,7 +386,7 @@ export class OpAperiodiqueComponent implements OnInit {
 
     // prendSouche(op, recursion: number) {
     //     const that = this;
-    //     that.ijPfService.soucheTechniqueWS(op, this.idToken).subscribe(obs => {
+    //     that.ij2srvc.soucheTechniqueWS(op, this.idToken).subscribe(obs => {
     //       console.log("pendre titre id =>", obs)
     //       if (obs.status == 200 && obs.body != null && obs.body.length > 0) {
     //         that.Export.listeSouche = obs.body;
@@ -564,4 +564,20 @@ export class OpAperiodiqueComponent implements OnInit {
         this.Liste.filtre.page = 1;
         this.prendListeOp();
     }
+
+    
+  apercu() {
+    const fenetre = window.open('', 'Ordre De Paiement');
+    if (fenetre != null) {
+      const style = fenetre.document.createElement('style');
+      style.innerHTML = `@page {margin-top: 0mm;}`;
+      fenetre.document.head.appendChild(style);
+      fenetre.document.write($('#divPourPDF-OP').html());
+      fenetre.document.write($('#btn-apercu').html());
+      fenetre.stop();
+    } else {
+      this.toast.info('Il n\'est pas encore possible de voir l\'aperçu du document');
+    }
+  }
+
 }
